@@ -3,12 +3,25 @@ services:
     image: wordpress:fpm
     volumes:
       - wp_app:/var/www/html
+      - ./php/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+      - ./php/opcache.ini:/usr/local/etc/php/conf.d/opcache.ini
+      - ./php/z-dokploy-overrides.ini:/usr/local/etc/php/conf.d/z-dokploy-overrides.ini
+      - ./php/fpm-pool.conf:/usr/local/etc/php-fpm.d/zz-dokploy.conf
+    environment:
+      WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST:-wp_db}
+      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME:-wordpress}
+      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER:-wordpress}
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_MEMORY_LIMIT', '${WORDPRESS_MEMORY_LIMIT:-256M}');
+        define('DISALLOW_FILE_EDIT', true);
     restart: unless-stopped
 
   nginx:
     image: nginx:alpine
     volumes:
       - wp_app:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     restart: unless-stopped
     depends_on:
       - wordpress
