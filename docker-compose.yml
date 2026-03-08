@@ -27,5 +27,15 @@ services:
     depends_on:
       - wordpress
 
+  mail-relay:
+    image: juanluisbaptiste/postfix-relay
+    environment:
+      - SMTP_SERVER=${SMTP_SERVER}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SERVER_HOSTNAME=${SERVER_HOSTNAME:-localhost}
+    restart: unless-stopped
+
 volumes:
   wp_app:

@@ -1,16 +1,13 @@
 # WordPress Deployment with Dokploy
 
-This repository contains a WordPress setup optimized for deployment via [Dokploy](https://dokploy.com/). It includes pre-configured PHP settings for file uploads, Opcache, and Nginx.
+This repository contains a WordPress setup optimized for deployment via [Dokploy](https://dokploy.com/). It includes pre-configured PHP settings for file uploads, Opcache, Nginx, and an SMTP relay sidecar for queued email delivery.
 
 ## Project Structure
 
-- `docker-compose.yml`: Main configuration to orchestrate WordPress and Nginx.
+- `docker-compose.yml`: Main configuration to orchestrate WordPress, Nginx, and the Mail Relay.
 - `php/`: Directory containing PHP configuration overrides.
-  - `uploads.ini`: Sets common limits like `upload_max_filesize` (64M) and `memory_limit` (256M).
-  - `opcache.ini`: Enables and optimizes Opcache for better performance.
-  - `fpm-pool.conf`: Custom PHP-FPM process manager settings.
 - `nginx/`: Directory containing Nginx configuration.
-  - `default.conf`: Configures Nginx to proxy PHP requests to the WordPress FPM service.
+- `mail-relay/`: (Managed by image) Sidecar service using Postfix for background SMTP delivery.
 
 ## Deployment Instructions
 
@@ -20,23 +17,43 @@ This repository contains a WordPress setup optimized for deployment via [Dokploy
     - Connect your Git repository.
     - Dokploy will automatically detect the `docker-compose.yml` file.
 3.  **Environment Variables**:
-    - Define the following environment variables in the Dokploy **"Environment"** tab for your project:
-      - `WORDPRESS_DB_HOST`: The hostname of your database (defaults to `wp_db`).
-      - `WORDPRESS_DB_NAME`: The name of your database (defaults to `wordpress`).
-      - `WORDPRESS_DB_USER`: Your database user (defaults to `wordpress`).
-      - `WORDPRESS_DB_PASSWORD`: Your database password.
+    - Define the following in the Dokploy **"Environment"** tab:
+    - **WordPress Variables**:
+      - `WORDPRESS_DB_HOST`: Database hostname (defaults to `wp_db`).
+      - `WORDPRESS_DB_PASSWORD`: Database password.
       - `WORDPRESS_MEMORY_LIMIT`: PHP memory limit (defaults to `256M`).
-4.  **Deploy**: Click **Deploy** to start the WordPress and Nginx containers.
+    - **SMTP Relay Variables**:
+      - `SMTP_SERVER`: Your SMTP provider (e.g., `smtp.mailgun.org`).
+      - `SMTP_PORT`: SMTP port (defaults to `587`).
+      - `SMTP_USERNAME`: SMTP user.
+      - `SMTP_PASSWORD`: SMTP password.
+      - `SERVER_HOSTNAME`: Your site domain (e.g., `example.com`).
+4.  **Deploy**: Click **Deploy** to start all services.
 
 ---
 
-## Modifying PHP Configuration in Dokploy
+## SMTP Setup (Queued Email)
 
-Since Dokploy allows you to modify any file, you can easily adjust your PHP settings directly from the dashboard.
+This setup uses a `mail-relay` service to handle emails in the background. This means WordPress doesn't "hang" while waiting for an external SMTP server to respond.
+
+### How to configure WordPress:
+1.  Install an SMTP plugin (e.g., **FluentSMTP** or **WP Mail SMTP**).
+2.  Choose **Other SMTP** or **Generic SMTP**.
+3.  Set the following configuration:
+    - **SMTP Host**: `mail-relay`
+    - **Port**: `25`
+    - **Encryption**: `None` (Secure because it's internal to the Docker network)
+    - **Authentication**: `No`
+4.  The sidecar will accept the mail instantly and manage the actual delivery to your external provider in the background.
+
+---
+
+## Modifying Configuration in Dokploy
+
+Since Dokploy allows you to modify any file, you can adjust your PHP or Nginx settings directly from the dashboard.
 
 ### Using Dokploy "Files" Feature
-To modify a configuration file:
-1.  Navigate to your **WordPress Service** in Dokploy.
+1.  Navigate to your **WordPress Service** (or Nginx) in Dokploy.
 2.  Go to the **Files** tab.
-3.  Choose the file you want to edit (e.g., `/usr/local/etc/php/conf.d/uploads.ini`).
-4.  **Save and Redeploy**: Dokploy will update the file content and restart the service with the new settings.
+3.  Edit the desired file (e.g., `/usr/local/etc/php/conf.d/uploads.ini`).
+4.  **Save and Redeploy**: Dokploy updates the file and restarts the service.
