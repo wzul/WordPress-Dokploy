@@ -18,6 +18,7 @@ The system consists of four primary services orchestrated via Docker Compose:
 - [**OpenLiteSpeed Management**](OpenLiteSpeed.md): Accessing the admin panel and tuning OLS.
 - [**Customizing PHP**](PHP-Configuration.md): How to adjust memory limits, upload sizes, and more.
 - [**File Manager**](File-Manager.md): Managing your files via the web interface.
+- [**Database Management**](Database-Management.md): Securely managing your MySQL/MariaDB with Adminer + WP Auth.
 - [**Security Hardening**](Security-Hardening.md): Best practices for protecting your site.
 
 ## 🛠️ Key Features
