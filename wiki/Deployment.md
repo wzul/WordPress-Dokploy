@@ -46,3 +46,6 @@ This setup is designed specifically for **Dokploy** using the "Compose" service 
 The system uses named volumes to ensure your data persists across redeployments:
 - `wp_app`: Persistent WordPress files (`/var/www/html`).
 - `filebrowser_db`: Persistent File Manager settings and users.
+
+## 🗄️ Database Management
+This stack does not include a built-in database manager like phpMyAdmin. We recommend using a shared, external phpMyAdmin instance or a desktop client (like Sequel Ace, TablePlus, or DBeaver) to manage your database using the credentials provided in Dokploy.
