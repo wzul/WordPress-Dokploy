@@ -1,6 +1,6 @@
 # WordPress Deployment with Dokploy
 
-This repository contains a WordPress setup optimized for deployment via [Dokploy](https://dokploy.com/). It includes pre-configured PHP settings for file uploads, Opcache, and a mechanism for easy overrides within Dokploy.
+This repository contains a WordPress setup optimized for deployment via [Dokploy](https://dokploy.com/). It includes pre-configured PHP settings for file uploads, Opcache, and Nginx.
 
 ## Project Structure
 
@@ -8,7 +8,6 @@ This repository contains a WordPress setup optimized for deployment via [Dokploy
 - `php/`: Directory containing PHP configuration overrides.
   - `uploads.ini`: Sets common limits like `upload_max_filesize` (64M) and `memory_limit` (256M).
   - `opcache.ini`: Enables and optimizes Opcache for better performance.
-  - `z-dokploy-overrides.ini`: A placeholder file meant for final overrides.
   - `fpm-pool.conf`: Custom PHP-FPM process manager settings.
 - `nginx/`: Directory containing Nginx configuration.
   - `default.conf`: Configures Nginx to proxy PHP requests to the WordPress FPM service.
@@ -31,22 +30,13 @@ This repository contains a WordPress setup optimized for deployment via [Dokploy
 
 ---
 
-## Overriding PHP Configuration with Dokploy
+## Modifying PHP Configuration in Dokploy
 
-One of the key features of this setup is the ability to override PHP settings directly from the Dokploy dashboard without modifying the code in your repository.
-
-### How it works
-PHP loads `.ini` files from `/usr/local/etc/php/conf.d/` in alphabetical order. We have mounted a file named `z-dokploy-overrides.ini` which will always be loaded **last**, allowing it to override any settings defined in `uploads.ini` or `opcache.ini`.
+Since Dokploy allows you to modify any file, you can easily adjust your PHP settings directly from the dashboard.
 
 ### Using Dokploy "Files" Feature
-To apply a patch or override:
+To modify a configuration file:
 1.  Navigate to your **WordPress Service** in Dokploy.
 2.  Go to the **Files** tab.
-3.  Create a new file with the following details:
-    - **Path**: `/usr/local/etc/php/conf.d/z-dokploy-overrides.ini`
-    - **Content**: Enter any PHP settings you wish to change. For example:
-      ```ini
-      memory_limit = 512M
-      upload_max_filesize = 128M
-      ```
-4.  **Save and Redeploy**: Dokploy will now mount your dashboard-managed file over the one in the repository, giving you full control over the PHP environment from the UI.
+3.  Choose the file you want to edit (e.g., `/usr/local/etc/php/conf.d/uploads.ini`).
+4.  **Save and Redeploy**: Dokploy will update the file content and restart the service with the new settings.

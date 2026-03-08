@@ -5,8 +5,9 @@ services:
       - wp_app:/var/www/html
       - ./php/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
       - ./php/opcache.ini:/usr/local/etc/php/conf.d/opcache.ini
-      - ./php/z-dokploy-overrides.ini:/usr/local/etc/php/conf.d/z-dokploy-overrides.ini
       - ./php/fpm-pool.conf:/usr/local/etc/php-fpm.d/zz-dokploy.conf
+    env_file:
+      - .env
     environment:
       WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST:-wp_db}
       WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME:-wordpress}
