@@ -28,12 +28,19 @@ services:
 
   mail-relay:
     image: juanluisbaptiste/postfix-relay
+    command: >
+      sh -c "
+      echo '/^Subject:/ PREPEND X-SES-TENANT: $${SES_TENANT_TAG:-default}' > /etc/postfix/header_checks &&
+      postconf -e 'smtp_header_checks = regexp:/etc/postfix/header_checks' &&
+      exec /run.sh
+      "
     environment:
       - SMTP_SERVER=${SMTP_SERVER}
       - SMTP_PORT=${SMTP_PORT:-587}
       - SMTP_USERNAME=${SMTP_USERNAME}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - SERVER_HOSTNAME=${SERVER_HOSTNAME:-localhost}
+      - SES_TENANT_TAG=${SES_TENANT_TAG}
     restart: unless-stopped
 
 volumes:

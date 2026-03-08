@@ -30,6 +30,7 @@ This repository contains a WordPress setup optimized for deployment via [Dokploy
       - `SMTP_PORT`: SMTP port (defaults to `587`).
       - `SMTP_USERNAME`, `SMTP_PASSWORD`: Your SMTP credentials.
       - `SERVER_HOSTNAME`: Your site domain (e.g., `example.com`).
+      - `SES_TENANT_TAG`: AWS SES tenant tag for tracking (e.g., `my-tenant`).
 4.  **Deploy**: Click **Deploy** to start all services.
 
 ---
