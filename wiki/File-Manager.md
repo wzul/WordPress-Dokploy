@@ -4,8 +4,7 @@ This stack includes **FileBrowser**, a lightweight web-based file manager that a
 
 ## 📁 Accessing the File Manager
 
-- **URL**: `https://your-domain.com/file-manager/` (Note the mandatory trailing slash).
-- **Internal Port**: Runs on the same port as the web server (**80**) via a reverse proxy context.
+- **URL**: `https://your-domain.com/<FILE_MANAGER_PATH>` (See [Security Hardening](Security-Hardening.md) for details).
 - **Username**: Defined by `FILE_MANAGER_USER` (defaults to `admin`)
 - **Password**: Defined by `FILE_MANAGER_PASSWORD` (defaults to `admin123`)
 

@@ -14,11 +14,22 @@ services:
 
   ols:
     image: litespeedtech/openlitespeed:latest
+    command: >
+      sh -c "
+      export FM_PATH=$${FILE_MANAGER_PATH:-/file-manager-secret} &&
+      export FM_PATH_SLASH=$${FM_PATH%/}/ &&
+      export FM_PATH_NO_SLASH=$${FM_PATH%/} &&
+      sed -i \"s|FILE_MANAGER_PATH_PLACEHOLDER|$$FM_PATH_SLASH|g\" /usr/local/lsws/conf/vhosts/Example/vhconf.conf &&
+      sed -i \"s|FILE_MANAGER_PATH_STRIPPED|$$FM_PATH_NO_SLASH|g\" /usr/local/lsws/conf/vhosts/Example/vhconf.conf &&
+      /usr/local/lsws/bin/lswsctrl start &&
+      tail -f /usr/local/lsws/logs/error.log
+      "
     volumes:
       - wp_app:/var/www/html
       - ./ols/vhconf.conf:/usr/local/lsws/conf/vhosts/Example/vhconf.conf
     environment:
       - OLS_PASSWORD=${OLS_PASSWORD:-admin123}
+      - FILE_MANAGER_PATH=${FILE_MANAGER_PATH:-/file-manager-secret}
     restart: unless-stopped
     depends_on:
       - wordpress
@@ -58,6 +69,7 @@ services:
     environment:
       - FILE_MANAGER_USER=${FILE_MANAGER_USER:-admin}
       - FILE_MANAGER_PASSWORD=${FILE_MANAGER_PASSWORD}
+      - FB_BASEURL=${FILE_MANAGER_PATH:-/file-manager-secret}
     restart: unless-stopped
 
 volumes:
