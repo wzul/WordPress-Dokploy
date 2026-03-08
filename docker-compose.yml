@@ -10,14 +10,6 @@ services:
       - ./php/msmtprc:/etc/msmtprc:ro
     env_file:
       - .env
-    environment:
-      WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST:-wp_db}
-      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME:-wordpress}
-      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER:-wordpress}
-      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
-      WORDPRESS_CONFIG_EXTRA: |
-        define('WP_MEMORY_LIMIT', '${WORDPRESS_MEMORY_LIMIT:-256M}');
-        define('DISALLOW_FILE_EDIT', true);
     restart: unless-stopped
 
   ols:
