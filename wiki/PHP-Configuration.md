@@ -19,7 +19,23 @@ Pre-configured with optimized settings for WordPress, including:
 - `opcache.memory_consumption=128`
 - `opcache.max_accelerated_files=4000`
 
-### 3. `fpm-pool.conf` (Process Management)
+### 3. FPM Tuning (Performance vs Resources)
+You can choose how PHP management behaves depending on your server size:
+
+#### **`dynamic` (Default / High Performance)**
+PHP keeps specialized "spare" processes ready to handle requests instantly.
+- Best for: Sites with consistent traffic.
+- Variables: `PHP_FPM_START_SERVERS`, `PHP_FPM_MIN_SPARE_SERVERS`, etc.
+
+#### **`ondemand` (Resource Saver)**
+PHP only spawns processes when a request actually arrives and kills them when idle.
+- Best for: Low-traffic sites or small VPS instances where RAM is tight.
+- Variable: Set `PHP_FPM_PM=ondemand`.
+
+> [!TIP]
+> All these values can be adjusted live in the Dokploy **Environment** settings. A redeploy will apply the new process management strategy.
+
+### 4. `fpm-pool.conf` (Process Management)
 Controls how many PHP processes are spawned. If you have a high-traffic site, you may want to increase `pm.max_children`.
 
 ## 🛠️ Modifying Settings via Dokploy

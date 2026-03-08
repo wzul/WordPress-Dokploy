@@ -22,14 +22,47 @@ if (!current_user_can('manage_options')) {
     }
 }
 
-// 3. Define the Adminer login defaults (Optional - pre-fills the server field)
+// 3. Define the Adminer logic
 function adminer_object() {
     class AdminerSoftware extends Adminer {
-        function login($login, $password) {
-            return true; // Still requires the DB password, but handles the UI better
+        /**
+         * Automatically provide database credentials from WordPress constants
+         */
+        function credentials() {
+            return [DB_HOST, DB_USER, DB_PASSWORD];
         }
+
+        /**
+         * Automatically select the WordPress database
+         */
+        function database() {
+            return DB_NAME;
+        }
+
+        /**
+         * Bypass the login form and authenticate using WP credentials
+         */
+        function login($login, $password) {
+            return true;
+        }
+
+        /**
+         * Hide the login form entirely since we are auto-logged in
+         */
+        function loginForm() {
+            return true; 
+        }
+
         function name() {
             return 'WP Database Manager';
+        }
+
+        function head() {
+            $design = $_ENV['ADMINER_DESIGN'] ?? getenv('ADMINER_DESIGN');
+            if ($design) {
+                echo '<link rel="stylesheet" type="text/css" href="https://www.adminer.org/static/download/' . htmlspecialchars($design) . '/adminer.css">';
+            }
+            return true;
         }
     }
     return new AdminerSoftware;

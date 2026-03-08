@@ -14,9 +14,10 @@ Unlike standard database managers, this Adminer setup is **wrapped in WordPress 
 
 - **URL**: `https://your-domain.com/<DB_MANAGER_PATH>`
 - **Default Path**: `/wp-db-admin`
-- **Username**: Use the `WORDPRESS_DB_USER` defined in your Dokploy settings.
-- **Password**: Use the `WORDPRESS_DB_PASSWORD` defined in your Dokploy settings.
-- **Server**: Set to `wp_db`.
+- **Auto-Login**: Enabled. You no longer need to enter database credentials manually. The system uses your WordPress configuration automatically.
+
+> [!IMPORTANT]
+> Because of auto-login, it is **essential** that you maintain a strong password for your WordPress administrator account and use the secret `DB_MANAGER_PATH` for added security.
 
 > [!TIP]
 > **Security by Obscurity**: You can change the `DB_MANAGER_PATH` environment variable in Dokploy to something unique (e.g., `/db-secret-555`) to make it even harder for bots to find.
