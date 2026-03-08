@@ -20,6 +20,7 @@ The system consists of four primary services orchestrated via Docker Compose:
 - [**File Manager**](File-Manager.md): Managing your files via the web interface.
 - [**Database Management**](Database-Management.md): Securely managing your MySQL/MariaDB with Adminer + WP Auth.
 - [**Security Hardening**](Security-Hardening.md): Best practices for protecting your site.
+- [**Cron & Scheduled Tasks**](Cron-Management.md): How WordPress cron is handled by the Dokploy Scheduler.
 
 ## 🛠️ Key Features
 
