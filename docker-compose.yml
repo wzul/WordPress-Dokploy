@@ -8,6 +8,11 @@ services:
       - ./php/mail.ini:/usr/local/etc/php/conf.d/mail.ini
       - ./php/fpm-pool.conf:/usr/local/etc/php-fpm.d/zz-dokploy.conf
       - ./php/msmtprc:/etc/msmtprc:ro
+    command: >
+      sh -c "
+      sed -i 's/WORDPRESS_MEMORY_LIMIT_PLACEHOLDER/$${WORDPRESS_MEMORY_LIMIT:-256M}/g' /usr/local/etc/php/conf.d/uploads.ini &&
+      /usr/local/bin/docker-entrypoint.sh php-fpm
+      "
     env_file:
       - .env
     restart: unless-stopped

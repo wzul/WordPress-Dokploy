@@ -9,7 +9,10 @@ Files in the `php/` directory are mounted into the WordPress container at startu
 Adjust this file to change:
 - `upload_max_filesize`
 - `post_max_size`
-- `memory_limit`
+- `max_execution_time`
+
+> [!TIP]
+> **Synchronized Memory Limit**: You don't need to edit `uploads.ini` to change the RAM limit. Simply set the `WORDPRESS_MEMORY_LIMIT` environment variable in Dokploy. The system will automatically update both your **PHP `memory_limit`** and the **WordPress `WP_MEMORY_LIMIT`** to match that value!
 
 ### 2. `opcache.ini` (Performance)
 Pre-configured with optimized settings for WordPress, including:
