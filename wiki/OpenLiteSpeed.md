@@ -4,7 +4,9 @@ This stack uses **OpenLiteSpeed (OLS)**, the open-source version of LiteSpeed En
 
 ## 🖥️ WebAdmin Console
 OpenLiteSpeed comes with a powerful web-based administration panel.
-- **URL**: `http://your-ip-or-domain:7080`
+
+- **Internal Port**: `7080`
+- **Dokploy Setup**: Add a domain in Dokploy and point it to service `ols` on port **7080**.
 - **User**: `admin`
 - **Password**: The value of `OLS_PASSWORD` in your Dokploy settings.
 

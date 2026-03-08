@@ -15,8 +15,14 @@ This setup is designed specifically for **Dokploy** using the "Compose" service 
 1. Create a new **Project**.
 2. Click **Add Service** -> **Compose**.
 3. Point to your Git repository URL.
-4. Go to the **Environment** tab and add the variables listed below.
-5. Click **Deploy**.
+4. **Domain Mapping**:
+   - Go to the **Domains** tab.
+   - **Main Site**: Add your domain (e.g., `mysite.com`) and point it to service `ols` on port **80**.
+   - **OLS Admin (Optional)**: Add a subdomain (e.g., `ols.mysite.com`) and point it to service `ols` on port **7080**.
+5. **Environment Variables**:
+   - Go to the **Environment** tab.
+   - Add the variables listed in the table below.
+6. **Deploy**: Click the **Deploy** button.
 
 ## 🔑 Environment Variables
 
@@ -28,6 +34,8 @@ This setup is designed specifically for **Dokploy** using the "Compose" service 
 | `WORDPRESS_DB_PASSWORD` | Database password | (Required) |
 | `WORDPRESS_MEMORY_LIMIT`| PHP Memory Limit | `256M` |
 | `OLS_PASSWORD` | Admin password for OpenLiteSpeed | `admin123` |
+| `FILE_MANAGER_USER` | Admin user for File Manager | `admin` |
+| `FILE_MANAGER_PASSWORD` | Admin password for File Manager | (Required) |
 | `SMTP_SERVER` | SMTP Relay Host (e.g. Amazon SES) | (Required) |
 | `SMTP_USERNAME` | SMTP Auth Username | (Required) |
 | `SMTP_PASSWORD` | SMTP Auth Password | (Required) |
@@ -35,4 +43,6 @@ This setup is designed specifically for **Dokploy** using the "Compose" service 
 | `SES_TENANT_TAG` | AWS SES Tenant ID for tagging | `default` |
 
 ## 📁 Managing Volumes
-The system uses a named volume `wp_app` for the `/var/www/html` directory. This ensures your plugins, themes, and uploads persist across redeployments.
+The system uses named volumes to ensure your data persists across redeployments:
+- `wp_app`: Persistent WordPress files (`/var/www/html`).
+- `filebrowser_db`: Persistent File Manager settings and users.

@@ -14,9 +14,6 @@ services:
 
   ols:
     image: litespeedtech/openlitespeed:latest
-    ports:
-      - "80:80"
-      - "7080:7080"
     volumes:
       - wp_app:/var/www/html
       - ./ols/vhconf.conf:/usr/local/lsws/conf/vhosts/Example/vhconf.conf
@@ -43,5 +40,26 @@ services:
       - SES_TENANT_TAG=${SES_TENANT_TAG}
     restart: unless-stopped
 
+  file-manager:
+    image: filebrowser/filebrowser:latest
+    user: "33:33"
+    command: >
+      sh -c "
+      if [ ! -f /database/filebrowser.db ]; then
+        /filebrowser config init --database /database/filebrowser.db &&
+        /filebrowser config set --database /database/filebrowser.db --baseurl /file-manager &&
+        /filebrowser users add $${FILE_MANAGER_USER:-admin} $${FILE_MANAGER_PASSWORD:-admin123} --perm.admin --database /database/filebrowser.db
+      fi &&
+      /filebrowser server --database /database/filebrowser.db
+      "
+    volumes:
+      - wp_app:/srv
+      - filebrowser_db:/database
+    environment:
+      - FILE_MANAGER_USER=${FILE_MANAGER_USER:-admin}
+      - FILE_MANAGER_PASSWORD=${FILE_MANAGER_PASSWORD}
+    restart: unless-stopped
+
 volumes:
   wp_app:
+  filebrowser_db:

@@ -17,6 +17,7 @@ The system consists of four primary services orchestrated via Docker Compose:
 - [**SMTP & Email Setup**](SMTP-and-Email.md): Learn about the zero-plugin email system and SES tagging.
 - [**OpenLiteSpeed Management**](OpenLiteSpeed.md): Accessing the admin panel and tuning OLS.
 - [**Customizing PHP**](PHP-Configuration.md): How to adjust memory limits, upload sizes, and more.
+- [**File Manager**](File-Manager.md): Managing your files via the web interface.
 
 ## 🛠️ Key Features
 
