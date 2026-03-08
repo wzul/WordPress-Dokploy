@@ -1,13 +1,13 @@
 # WordPress Deployment with Dokploy
 
-This repository contains a WordPress setup optimized for deployment via [Dokploy](https://dokploy.com/). It includes pre-configured PHP settings for file uploads, Opcache, Nginx, and an SMTP relay sidecar for queued email delivery.
+This repository contains a WordPress setup optimized for deployment via [Dokploy](https://dokploy.com/). It includes pre-configured PHP settings for file uploads, Opcache, Nginx, and a built-in SMTP relay sidecar for queued email delivery.
 
 ## Project Structure
 
 - `docker-compose.yml`: Main configuration to orchestrate WordPress, Nginx, and the Mail Relay.
 - `php/`: Directory containing PHP configuration overrides.
+  - `smtp.php`: A "Must-Use" plugin that automatically configures WordPress to use the SMTP relay sidecar.
 - `nginx/`: Directory containing Nginx configuration.
-- `mail-relay/`: (Managed by image) Sidecar service using Postfix for background SMTP delivery.
 
 ## Deployment Instructions
 
@@ -32,19 +32,14 @@ This repository contains a WordPress setup optimized for deployment via [Dokploy
 
 ---
 
-## SMTP Setup (Queued Email)
+## SMTP Setup (Zero-Plugin / Automatic)
 
-This setup uses a `mail-relay` service to handle emails in the background. This means WordPress doesn't "hang" while waiting for an external SMTP server to respond.
+This project uses a **Must-Use (MU) Plugin** strategy. We have mounted `php/smtp.php` directly into WordPress's `mu-plugins` folder.
 
-### How to configure WordPress:
-1.  Install an SMTP plugin (e.g., **FluentSMTP** or **WP Mail SMTP**).
-2.  Choose **Other SMTP** or **Generic SMTP**.
-3.  Set the following configuration:
-    - **SMTP Host**: `mail-relay`
-    - **Port**: `25`
-    - **Encryption**: `None` (Secure because it's internal to the Docker network)
-    - **Authentication**: `No`
-4.  The sidecar will accept the mail instantly and manage the actual delivery to your external provider in the background.
+**Benefits:**
+- **No Configuration Required**: You don't need to install or configure any SMTP plugin in the WordPress dashboard.
+- **Background Queueing**: The `mail-relay` service handles emails in the background so your site stays fast.
+- **Port 25 Internal**: WordPress connects to the sidecar on port 25 without any authentication or encryption, which is safe inside the internal Docker network.
 
 ---
 

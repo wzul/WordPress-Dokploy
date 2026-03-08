@@ -6,6 +6,7 @@ services:
       - ./php/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
       - ./php/opcache.ini:/usr/local/etc/php/conf.d/opcache.ini
       - ./php/fpm-pool.conf:/usr/local/etc/php-fpm.d/zz-dokploy.conf
+      - ./php/smtp.php:/var/www/html/wp-content/mu-plugins/smtp.php
     env_file:
       - .env
     environment:
