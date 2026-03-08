@@ -1,11 +1,13 @@
 services:
   wordpress:
-    image: wordpress:fpm
+    build: .
     volumes:
       - wp_app:/var/www/html
       - ./php/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
       - ./php/opcache.ini:/usr/local/etc/php/conf.d/opcache.ini
+      - ./php/mail.ini:/usr/local/etc/php/conf.d/mail.ini
       - ./php/fpm-pool.conf:/usr/local/etc/php-fpm.d/zz-dokploy.conf
+      - ./php/msmtprc:/etc/msmtprc:ro
       - ./php/smtp.php:/var/www/html/wp-content/mu-plugins/smtp.php
     env_file:
       - .env
