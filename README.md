@@ -2,6 +2,9 @@
 
 This repository contains a WordPress setup optimized for deployment via [Dokploy](https://dokploy.com/). It includes pre-configured PHP settings, **OpenLiteSpeed** as the web server, and a built-in SMTP relay sidecar for high-performance email delivery.
 
+> [!TIP]
+> **Check out the [Project Wiki](wiki/Home.md) for detailed documentation on architecture, SMTP, and OpenLiteSpeed management.**
+
 ## Project Structure
 
 - `Dockerfile`: Custom image that installs `msmtp` for global PHP `mail()` support.
