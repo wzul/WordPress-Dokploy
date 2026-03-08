@@ -1,0 +1,17 @@
+services:
+  wordpress:
+    image: wordpress:fpm
+    volumes:
+      - wp_app:/var/www/html
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - wp_app:/var/www/html
+    restart: unless-stopped
+    depends_on:
+      - wordpress
+
+volumes:
+  wp_app:
