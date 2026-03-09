@@ -1,6 +1,7 @@
 services:
   wordpress:
     build: .
+    entrypoint: ["bash", "/usr/local/bin/docker-entrypoint-extra.sh"]
     volumes:
       - wp_app:/var/www/html
       - ./php:/tmp/php:ro
