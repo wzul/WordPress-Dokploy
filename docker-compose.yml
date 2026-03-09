@@ -20,19 +20,28 @@ services:
     image: litespeedtech/openlitespeed:latest
     command: >
       sh -c "
-      # 1. Map all hostnames to the Example virtual host
-      sed -i 's/map\s*Example\s*localhost/map Example *, localhost/g' /usr/local/lsws/conf/httpd_config.conf &&
+      # 1. Force Permissions for OLS (lshttpd)
+      chown -R 999:999 /usr/local/lsws/Example/html &&
+      
+      # 2. Map all hostnames to the Example virtual host
+      # This fixes 404s when accessing via real domains like dentaluna.my
+      sed -i 's/map\s*Example\s*[a-zA-Z0-9.,\s]*/map Example */g' /usr/local/lsws/conf/httpd_config.conf &&
 
       export FM_PATH=$${FILE_MANAGER_PATH:-/file-manager-secret} &&
       export DB_PATH=$${DB_MANAGER_PATH:-/wp-db-admin} &&
       export FM_PATH_SLASH=$${FM_PATH%/}/ &&
       export FM_PATH_NO_SLASH=$${FM_PATH%/} &&
 
-      # 2. Inject secret paths into vhconf.conf safely
+      # 3. Inject secret paths into vhconf.conf safely
       sed \"s|FILE_MANAGER_PATH_PLACEHOLDER|$$FM_PATH_SLASH|g\" /usr/local/lsws/conf/vhosts/Example/vhconf.conf > /tmp/vhconf.tmp &&
       sed -i \"s|FILE_MANAGER_PATH_STRIPPED|$$FM_PATH_NO_SLASH|g\" /tmp/vhconf.tmp &&
       sed -i \"s|DB_MANAGER_PATH_PLACEHOLDER|$$DB_PATH|g\" /tmp/vhconf.tmp &&
       cat /tmp/vhconf.tmp > /usr/local/lsws/conf/vhosts/Example/vhconf.conf &&
+
+      # 4. Debug: Print file list to logs
+      echo '--- OLS WEB ROOT CONTENT ---' &&
+      ls -l /usr/local/lsws/Example/html &&
+      echo '---------------------------' &&
 
       /usr/local/lsws/bin/lswsctrl start &&
       tail -f /usr/local/lsws/logs/error.log
