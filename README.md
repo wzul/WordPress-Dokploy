@@ -65,6 +65,12 @@ This setup automatically installs and enables the **LiteSpeed Cache** plugin as 
 >
 > You can verify the status under **LiteSpeed Cache > Settings > Object**. You should see that Object Cache is enabled and connected to the `valkey` host.
 
+### Automated WP-Cron
+This project offloads WordPress cron tasks to the **Dokploy Scheduler**. 
+- The internal WP-Cron is automatically disabled in `wp-config.php` when `DISABLE_WP_CRON=true` is set in your environment.
+- This prevents performance issues caused by cron tasks running during visitor page loads.
+- See the [Cron Management Wiki](wiki/Cron-Management.md) for setup instructions.
+
 ---
 
 ## Why OpenLiteSpeed?

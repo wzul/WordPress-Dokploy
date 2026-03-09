@@ -4,9 +4,10 @@ By default, WordPress runs its scheduled tasks (cron) only when a visitor visits
 
 ## 🛡️ How it works
 
-1.  **Internal Cron Disabled**: The internal WordPress cron is disabled in `wp-config.php` via the `DISABLE_WP_CRON` environment variable.
-2.  **Dokploy Scheduler**: Dokploy triggers the WordPress cron on a fixed schedule.
-3.  **Direct Execution**: Dokploy runs the `php wp-cron.php` command directly inside the `wordpress` container.
+1.  **Automated Configuration**: The `docker-entrypoint-extra.sh` script checks for the `DISABLE_WP_CRON=true` environment variable.
+2.  **Internal Cron Disabled**: If enabled, the entrypoint automatically injects `define('DISABLE_WP_CRON', true);` into your `wp-config.php` file on startup. This ensures the setting is persistent and correct even if the file is regenerated.
+3.  **Dokploy Scheduler**: With the internal cron disabled, Dokploy takes over by triggering the WordPress cron on a fixed schedule (recommended every 5 minutes).
+4.  **Direct Execution**: Dokploy runs the `php /var/www/html/wp-cron.php` command directly inside the `wordpress` container.
 
 ## 🛠️ Configuration in Dokploy
 
@@ -19,7 +20,7 @@ Instead of adding another container (like Ofelia), you can use the native Dokplo
     - **Name**: `WordPress Cron`
     - **Schedule**: `*/5 * * * *` (Every 5 minutes)
     - **Service**: Select `wordpress`.
-    - **Command**: `php wp-cron.php`
+    - **Command**: `php /var/www/html/wp-cron.php`
 5.  Click **Save**.
 
 ## 🚀 Monitoring
