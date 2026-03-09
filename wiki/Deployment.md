@@ -51,6 +51,7 @@ This setup is designed specifically for **Dokploy** using the "Compose" service 
 ## 📁 Managing Volumes
 The system uses named volumes to ensure your data persists across redeployments:
 - `wp_app`: Persistent WordPress files (`/var/www/html`).
+- `valkey_data`: (Optional) If you choose to persist Valkey data, you can add a volume to the `valkey` service.
 
 ## 🗄️ Database Management
 This stack includes **Adminer** as a built-in tool within the WordPress container. It is pre-configured with **WordPress Authentication Integration** to ensure only site administrators can access the database management interface. 

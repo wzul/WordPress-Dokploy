@@ -4,11 +4,12 @@ This repository provides a high-performance, production-ready WordPress stack op
 
 ## 🏗️ Architecture Overview
 
-The system consists of three primary services orchestrated via Docker Compose:
+The system consists of four primary services orchestrated via Docker Compose:
 
-1.  **WordPress (Unified)**: A high-performance container that bundles **OpenLiteSpeed** and **WordPress (PHP 8.4)** together. It uses LSAPI for native communication between the web server and PHP.
+1.  **WordPress (Unified)**: A high-performance container that bundles **OpenLiteSpeed** and **WordPress (PHP 8.4)** together.
 2.  **Mail Relay**: A Postfix sidecar that handles SMTP queueing and background delivery.
-3.  **Database**: (External or linked service) The MySQL/MariaDB backend.
+3.  **Valkey**: A high-performance object cache (Redis fork) to drastically speed up WordPress.
+4.  **Database**: (External or linked service) The MySQL/MariaDB backend.
 
 ## 🚀 Quick Links
 

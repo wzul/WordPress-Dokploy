@@ -25,6 +25,11 @@ services:
       - SES_TENANT_TAG=${SES_TENANT_TAG}
     restart: unless-stopped
 
+  valkey:
+    image: valkey/valkey:latest
+    command: valkey-server --protected-mode no
+    restart: unless-stopped
+
   file-manager:
     image: filebrowser/filebrowser:latest
     user: "65534:65534"
