@@ -38,10 +38,6 @@ This setup is designed specifically for **Dokploy** using the "Compose" service 
 | `WORDPRESS_DB_PASSWORD` | Database password | (Required) |
 | `WORDPRESS_MEMORY_LIMIT`| PHP Memory Limit | `256M` |
 | `OLS_PASSWORD` | Admin password for OpenLiteSpeed | `admin123` |
-| `DB_MANAGER_PATH` | Secret URL path for Adminer | `/wp-db-admin` |
-| `FILE_MANAGER_PATH` | Secret URL path for File Manager | `/file-manager-secret` |
-| `FILE_MANAGER_USER` | Admin user for File Manager | `admin` |
-| `FILE_MANAGER_PASSWORD` | Admin password for File Manager | (Required) |
 | `SMTP_SERVER` | SMTP Relay Host (e.g. Amazon SES) | (Required) |
 | `SMTP_USERNAME` | SMTP Auth Username | (Required) |
 | `SMTP_PASSWORD` | SMTP Auth Password | (Required) |
@@ -51,9 +47,3 @@ This setup is designed specifically for **Dokploy** using the "Compose" service 
 ## 📁 Managing Volumes
 The system uses named volumes to ensure your data persists across redeployments:
 - `wp_app`: Persistent WordPress files (`/var/www/html`).
-- `valkey_data`: (Optional) If you choose to persist Valkey data, you can add a volume to the `valkey` service.
-
-## 🗄️ Database Management
-This stack includes **Adminer** as a built-in tool within the WordPress container. It is pre-configured with **WordPress Authentication Integration** to ensure only site administrators can access the database management interface. 
-
-For more details, see the [**Database Management Wiki**](Database-Management.md).
