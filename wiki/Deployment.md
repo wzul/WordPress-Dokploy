@@ -20,7 +20,7 @@ This setup is designed specifically for **Dokploy** using the "Compose" service 
    > Dokploy current cannot successfully inject host-level environment variables for the "Compose" service type. To manage your secrets:
    - Go to the **Files** tab of your service.
    - Create a new file manually named exactly **`env`** (without the dot).
-   - Paste your configuration variables (e.g., `WORDPRESS_DB_PASSWORD=...`) into this file.
+   - Paste your configuration variables (e.g., `OLS_PASSWORD=...`) into this file.
    - The `docker-compose.yml` is configured to read from this file natively.
 5. **Domain Mapping**:
    - Go to the **Domains** tab.
@@ -32,11 +32,6 @@ This setup is designed specifically for **Dokploy** using the "Compose" service 
 
 | Variable | Description | Default |
 | :--- | :--- | :--- |
-| `WORDPRESS_DB_HOST` | Hostname of your database | `wp_db` |
-| `WORDPRESS_DB_NAME` | Name of your database | `wordpress` |
-| `WORDPRESS_DB_USER` | Database user | `wordpress` |
-| `WORDPRESS_DB_PASSWORD` | Database password | (Required) |
-| `WORDPRESS_MEMORY_LIMIT`| PHP Memory Limit | `256M` |
 | `OLS_PASSWORD` | Admin password for OpenLiteSpeed | `admin123` |
 | `SMTP_SERVER` | SMTP Relay Host (e.g. Amazon SES) | (Required) |
 | `SMTP_USERNAME` | SMTP Auth Username | (Required) |
