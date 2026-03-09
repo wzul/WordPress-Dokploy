@@ -51,10 +51,33 @@ The custom Dockerfile installs `msmtp`, which is configured to route all traffic
 
 ---
 
+---
+
+## Caching & Performance
+
+### LiteSpeed Cache (LSCache)
+This setup automatically installs and enables the **LiteSpeed Cache** plugin as a **Must-Use (MU) plugin**. This ensures it is always active and cannot be accidentally deactivated from the WordPress dashboard.
+
+### Redis Object Cache
+> [!IMPORTANT]
+> **Do not install the separate "Redis Object Cache" plugin.**
+> LiteSpeed Cache has a built-in Object Cache feature that is fully compatible with the included Redis/Valkey service. Using both will cause conflicts and performance degradation.
+>
+> To configure:
+> 1. Go to **LiteSpeed Cache > Settings > Object**.
+> 2. Enable **Object Cache**.
+> 3. Set Method to **Redis**.
+> 4. Host: `valkey` (as defined in `docker-compose.yml`).
+> 5. Port: `6379`.
+
+---
+
 ## Why OpenLiteSpeed?
 OpenLiteSpeed is a high-performance HTTP server that handles massive concurrency with low memory footprint. It is specifically optimized for WordPress and supports **LSCache** (the LiteSpeed Cache plugin).
 
-### Accessing the OLS Admin Panel
+---
+
+## Accessing the OLS Admin Panel
 You can access the OLS WebAdmin console on port **7080**.
 - **User**: `admin`
 - **Password**: The `OLS_PASSWORD` you set in Dokploy.

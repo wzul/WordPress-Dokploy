@@ -12,7 +12,18 @@ OpenLiteSpeed comes with a powerful web-based administration panel.
 - **Password**: The value of `OLS_PASSWORD` in your Dokploy settings.
 
 ## 🚀 LSCache
-To get the most out of OLS, we recommend installing the **LiteSpeed Cache** plugin in WordPress. It communicates directly with the OLS server to handle page caching, image optimization, and more.
+The **LiteSpeed Cache** plugin is automatically installed as a **Must-Use (MU) plugin**. This ensures it is always active and cannot be deactivated via the WordPress dashboard.
+
+### 🛑 Important: Object Caching
+> [!WARNING]
+> **Do NOT use the "Redis Object Cache" plugin.**
+>
+> LiteSpeed Cache replaces the need for any other Redis/Object Cache plugins. It includes its own highly optimized Object Cache module that is fully compatible with our `valkey` (Redis) service.
+>
+> **Configuration:**
+> - **Method:** Redis
+> - **Host:** `valkey`
+> - **Port:** `6379`
 
 ## 🔧 Architecture
 In this **unified setup**, OpenLiteSpeed and PHP are in the same container.
