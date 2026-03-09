@@ -8,11 +8,11 @@ services:
     init: true
     env_file:
       - .env
-    # environment:
-    #   - ADMINER_DESIGN=${ADMINER_DESIGN:-pepa-linha}
-    #   - OLS_PASSWORD=${OLS_PASSWORD:-admin123}
-    #   - FILE_MANAGER_PATH=${FILE_MANAGER_PATH:-/file-manager-secret}
-    #   - DB_MANAGER_PATH=${DB_MANAGER_PATH:-/wp-db-admin}
+    environment:
+      - ADMINER_DESIGN=${ADMINER_DESIGN:-pepa-linha}
+      - OLS_PASSWORD=${OLS_PASSWORD:-admin123}
+      - FILE_MANAGER_PATH=${FILE_MANAGER_PATH:-/file-manager-secret}
+      - DB_MANAGER_PATH=${DB_MANAGER_PATH:-/wp-db-admin}
     restart: unless-stopped
 
   mail-relay:
