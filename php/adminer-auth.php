@@ -23,10 +23,16 @@ if (!current_user_can('manage_options')) {
 }
 
 // 3. Define the Adminer logic
-// We define a fallback class to prevent Fatal Error if the single-file version
-// hasn't fully registered the global 'Adminer' class at this exact moment.
+// We define a fallback class with common methods to prevent Fatal Errors
+// during execution of single-file Adminer versions.
 if (!class_exists('Adminer')) {
-    class Adminer { }
+    class Adminer {
+        function credentials() { return [DB_HOST, DB_USER, DB_PASSWORD]; }
+        function login($login, $password) { return true; }
+        function database() { return DB_NAME; }
+        function csp() { return []; }
+        function __call($name, $args) { return null; }
+    }
 }
 
 function adminer_object() {
