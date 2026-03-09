@@ -1,43 +1,49 @@
 #!/bin/bash
 set -e
 
-# Parse templates and generate the active configuration files cleanly.
-# This prevents Docker from overwriting the host repository files and safely handles the placeholders.
+echo "Starting LiteSpeed + WordPress Initialization..."
 
-if [ -f "/tmp/php/uploads.ini" ]; then
-    cp /tmp/php/uploads.ini /usr/local/etc/php/conf.d/uploads-dynamic.ini
-    sed -i "s/WORDPRESS_MEMORY_LIMIT_PLACEHOLDER/${WORDPRESS_MEMORY_LIMIT:-256M}/g" /usr/local/etc/php/conf.d/uploads-dynamic.ini
+# 1. Download WordPress core if it doesn't exist
+if [ ! -d "/var/www/html/wp-includes" ]; then
+    echo "WordPress core not found. Downloading..."
+    curl -o /tmp/wordpress.tar.gz -fSL "https://wordpress.org/latest.tar.gz"
+    tar -xzf /tmp/wordpress.tar.gz -C /tmp/
+    cp -rp /tmp/wordpress/* /var/www/html/
+    chown -R nobody:nogroup /var/www/html
+    rm -rf /tmp/wordpress /tmp/wordpress.tar.gz
 fi
 
-if [ -f "/tmp/php/fpm-pool.conf" ]; then
-    cp /tmp/php/fpm-pool.conf /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
-    sed -i "s/FPM_PM_TYPE_PLACEHOLDER/${PHP_FPM_PM:-dynamic}/g" /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
-    sed -i "s/FPM_MAX_CHILDREN_PLACEHOLDER/${PHP_FPM_MAX_CHILDREN:-5}/g" /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
-    sed -i "s/FPM_START_SERVERS_PLACEHOLDER/${PHP_FPM_START_SERVERS:-1}/g" /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
-    sed -i "s/FPM_MIN_SPARE_SERVERS_PLACEHOLDER/${PHP_FPM_MIN_SPARE_SERVERS:-1}/g" /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
-    sed -i "s/FPM_MAX_SPARE_SERVERS_PLACEHOLDER/${PHP_FPM_MAX_SPARE_SERVERS:-2}/g" /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
-    sed -i "s/FPM_IDLE_TIMEOUT_PLACEHOLDER/${PHP_FPM_IDLE_TIMEOUT:-10s}/g" /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
-    
-    # Ensure clear_env is disabled so Docker environment variables are passed to PHP worker processes
-    if ! grep -q "clear_env = no" /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf; then
-        echo "" >> /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
-        echo "; Make sure environment variables are passed to PHP" >> /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
-        echo "clear_env = no" >> /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
-        echo "env[WORDPRESS_DB_HOST] = \${WORDPRESS_DB_HOST}" >> /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
-        echo "env[WORDPRESS_DB_USER] = \${WORDPRESS_DB_USER}" >> /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
-        echo "env[WORDPRESS_DB_PASSWORD] = \${WORDPRESS_DB_PASSWORD}" >> /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
-        echo "env[WORDPRESS_DB_NAME] = \${WORDPRESS_DB_NAME}" >> /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
-        echo "env[WORDPRESS_TABLE_PREFIX] = \${WORDPRESS_TABLE_PREFIX}" >> /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
-        echo "env[WORDPRESS_DEBUG] = \${WORDPRESS_DEBUG}" >> /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
-        echo "env[WORDPRESS_MEMORY_LIMIT] = \${WORDPRESS_MEMORY_LIMIT}" >> /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
-    fi
+# 2. Inject environment variables for LiteSpeed PHP settings into LSAPI
+PHP_MODS_DIR="/usr/local/lsws/lsphp84/etc/php/8.4/mods-available"
+if [ -f "/tmp/php/uploads.ini" ] && [ -d "$PHP_MODS_DIR" ]; then
+    cp /tmp/php/uploads.ini "$PHP_MODS_DIR/99-uploads-dynamic.ini"
+    sed -i "s/WORDPRESS_MEMORY_LIMIT_PLACEHOLDER/${WORDPRESS_MEMORY_LIMIT:-256M}/g" "$PHP_MODS_DIR/99-uploads-dynamic.ini"
 fi
 
-# Copy other static configurations from the safe mounted directory
-cp -p /tmp/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini 2>/dev/null || true
-cp -p /tmp/php/mail.ini /usr/local/etc/php/conf.d/mail.ini 2>/dev/null || true
-cp -p /tmp/php/msmtprc /etc/msmtprc 2>/dev/null || true
-cp -p /tmp/php/adminer-auth.php /var/www/html/adminer-auth.php 2>/dev/null || true
+# Apply other static PHP configurations if they exist
+[ -f "/tmp/php/opcache.ini" ] && cp -p /tmp/php/opcache.ini "$PHP_MODS_DIR/99-opcache.ini" 2>/dev/null || true
+[ -f "/tmp/php/mail.ini" ] && cp -p /tmp/php/mail.ini "$PHP_MODS_DIR/99-mail.ini" 2>/dev/null || true
+[ -f "/tmp/php/msmtprc" ] && cp -p /tmp/php/msmtprc /etc/msmtprc 2>/dev/null || true
+[ -f "/tmp/php/adminer-auth.php" ] && cp -p /tmp/php/adminer-auth.php /var/www/html/adminer-auth.php 2>/dev/null || true
 
-# 3. Call the original WordPress entrypoint
-exec docker-entrypoint.sh "$@"
+# 3. Handle OpenLiteSpeed configuration
+FM_PATH=${FILE_MANAGER_PATH:-/file-manager-secret}
+DB_PATH=${DB_MANAGER_PATH:-/wp-db-admin}
+FM_PATH_SLASH=${FM_PATH%/}/
+FM_PATH_NO_SLASH=${FM_PATH%/}
+
+if [ -f "/tmp/ols/vhosts/localhost/vhconf.conf" ]; then
+    mkdir -p /usr/local/lsws/conf/vhosts/localhost/
+    cp /tmp/ols/vhosts/localhost/vhconf.conf /usr/local/lsws/conf/vhosts/localhost/vhconf.conf
+    sed -i "s|FILE_MANAGER_PATH_PLACEHOLDER|$FM_PATH_SLASH|g" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf
+    sed -i "s|FILE_MANAGER_PATH_STRIPPED|$FM_PATH_NO_SLASH|g" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf
+    sed -i "s|DB_MANAGER_PATH_PLACEHOLDER|$DB_PATH|g" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf
+fi
+
+if [ -f "/tmp/ols/templates/docker.conf" ]; then
+    mkdir -p /usr/local/lsws/conf/templates/
+    cp /tmp/ols/templates/docker.conf /usr/local/lsws/conf/templates/docker.conf
+fi
+
+echo "Initialization complete. Starting OpenLiteSpeed..."
+exec /entrypoint.sh "$@"

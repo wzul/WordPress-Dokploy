@@ -4,6 +4,7 @@ services:
     volumes:
       - wp_app:/var/www/html
       - ./php:/tmp/php:ro
+      - ./ols:/tmp/ols:ro
     init: true
     environment:
       - WORDPRESS_DB_HOST=${WORDPRESS_DB_HOST}
@@ -13,42 +14,11 @@ services:
       - WORDPRESS_TABLE_PREFIX=${WORDPRESS_TABLE_PREFIX}
       - WORDPRESS_DEBUG=${WORDPRESS_DEBUG}
       - WORDPRESS_MEMORY_LIMIT=${WORDPRESS_MEMORY_LIMIT:-256M}
-      - PHP_FPM_PM=${PHP_FPM_PM:-dynamic}
-      - PHP_FPM_MAX_CHILDREN=${PHP_FPM_MAX_CHILDREN:-5}
-      - PHP_FPM_START_SERVERS=${PHP_FPM_START_SERVERS:-1}
-      - PHP_FPM_MIN_SPARE_SERVERS=${PHP_FPM_MIN_SPARE_SERVERS:-1}
-      - PHP_FPM_MAX_SPARE_SERVERS=${PHP_FPM_MAX_SPARE_SERVERS:-2}
-      - PHP_FPM_IDLE_TIMEOUT=${PHP_FPM_IDLE_TIMEOUT:-10s}
       - ADMINER_DESIGN=${ADMINER_DESIGN:-pepa-linha}
-    restart: unless-stopped
-
-  ols:
-    image: litespeedtech/openlitespeed:latest
-    command: >
-      sh -c "
-      export FM_PATH=$${FILE_MANAGER_PATH:-/file-manager-secret} &&
-      export DB_PATH=$${DB_MANAGER_PATH:-/wp-db-admin} &&
-      export FM_PATH_SLASH=$${FM_PATH%/}/ &&
-      export FM_PATH_NO_SLASH=$${FM_PATH%/} &&
-      
-      cp /tmp/ols/vhosts/localhost/vhconf.conf /usr/local/lsws/conf/vhosts/localhost/vhconf.conf &&
-      cp /tmp/ols/templates/docker.conf /usr/local/lsws/conf/templates/docker.conf &&
-      sed -i \"s|FILE_MANAGER_PATH_PLACEHOLDER|$$FM_PATH_SLASH|g\" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf &&
-      sed -i \"s|FILE_MANAGER_PATH_STRIPPED|$$FM_PATH_NO_SLASH|g\" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf &&
-      sed -i \"s|DB_MANAGER_PATH_PLACEHOLDER|$$DB_PATH|g\" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf &&
-
-      /entrypoint.sh
-      "
-    volumes:
-      - wp_app:/var/www/html
-      - ./ols:/tmp/ols:ro
-    environment:
       - OLS_PASSWORD=${OLS_PASSWORD:-admin123}
       - FILE_MANAGER_PATH=${FILE_MANAGER_PATH:-/file-manager-secret}
       - DB_MANAGER_PATH=${DB_MANAGER_PATH:-/wp-db-admin}
     restart: unless-stopped
-    depends_on:
-      - wordpress
 
   mail-relay:
     build: ./mail-relay
@@ -63,7 +33,7 @@ services:
 
   file-manager:
     image: filebrowser/filebrowser:latest
-    user: "33:33"
+    user: "65534:65534"
     entrypoint: ["sh", "-c"]
     command: >
       "if [ ! -f /srv/.filebrowser.db ]; then
