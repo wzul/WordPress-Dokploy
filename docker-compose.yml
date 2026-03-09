@@ -58,15 +58,15 @@ services:
   file-manager:
     image: filebrowser/filebrowser:latest
     user: "33:33"
+    entrypoint: ["sh", "-c"]
     command: >
-      sh -c " if [ ! -f /database/filebrowser.db ]; then
-        /filebrowser config init --database /database/filebrowser.db &&
-        /filebrowser config set --database /database/filebrowser.db --baseurl /file-manager &&
-        /filebrowser users add $${FILE_MANAGER_USER:-admin} $${FILE_MANAGER_PASSWORD:-admin123} --perm.admin --database /database/filebrowser.db
-      fi && /filebrowser server --database /database/filebrowser.db "
+      "if [ ! -f /srv/.filebrowser.db ]; then
+        filebrowser config init --database /srv/.filebrowser.db &&
+        filebrowser config set --database /srv/.filebrowser.db --baseurl /file-manager --port 80 --address 0.0.0.0 &&
+        filebrowser users add $${FILE_MANAGER_USER:-admin} $${FILE_MANAGER_PASSWORD:-admin12345678} --perm.admin --database /srv/.filebrowser.db
+      fi && filebrowser --database /srv/.filebrowser.db --port 80 --address 0.0.0.0"
     volumes:
       - wp_app:/srv
-      - filebrowser_db:/database
     environment:
       - FILE_MANAGER_USER=${FILE_MANAGER_USER:-admin}
       - FILE_MANAGER_PASSWORD=${FILE_MANAGER_PASSWORD}
@@ -75,4 +75,3 @@ services:
 
 volumes:
   wp_app:
-  filebrowser_db:
