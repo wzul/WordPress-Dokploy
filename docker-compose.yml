@@ -24,9 +24,11 @@ services:
       export DB_PATH=$${DB_MANAGER_PATH:-/wp-db-admin} &&
       export FM_PATH_SLASH=$${FM_PATH%/}/ &&
       export FM_PATH_NO_SLASH=$${FM_PATH%/} &&
-      sed -i \"s|FILE_MANAGER_PATH_PLACEHOLDER|$$FM_PATH_SLASH|g\" /usr/local/lsws/conf/vhosts/Example/vhconf.conf &&
-      sed -i \"s|FILE_MANAGER_PATH_STRIPPED|$$FM_PATH_NO_SLASH|g\" /usr/local/lsws/conf/vhosts/Example/vhconf.conf &&
-      sed -i \"s|DB_MANAGER_PATH_PLACEHOLDER|$$DB_PATH|g\" /usr/local/lsws/conf/vhosts/Example/vhconf.conf &&
+      # Safe sed for bind mounts
+      sed \"s|FILE_MANAGER_PATH_PLACEHOLDER|$$FM_PATH_SLASH|g\" /usr/local/lsws/conf/vhosts/Example/vhconf.conf > /tmp/vhconf.conf &&
+      sed -i \"s|FILE_MANAGER_PATH_STRIPPED|$$FM_PATH_NO_SLASH|g\" /tmp/vhconf.conf &&
+      sed -i \"s|DB_MANAGER_PATH_PLACEHOLDER|$$DB_PATH|g\" /tmp/vhconf.conf &&
+      cat /tmp/vhconf.conf > /usr/local/lsws/conf/vhosts/Example/vhconf.conf &&
       /usr/local/lsws/bin/lswsctrl start &&
       tail -f /usr/local/lsws/logs/error.log
       "
