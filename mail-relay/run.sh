@@ -120,13 +120,15 @@ if [ ! -z "${SMTPUTF8_ENABLE}" ]; then
 fi
 
 if [ ! -z "${OVERWRITE_FROM}" ]; then
-  echo -e "/^From:.*$/ REPLACE From: $OVERWRITE_FROM" > /etc/postfix/smtp_header_checks
-  echo -e "/.*/ $OVERWRITE_FROM" > /etc/postfix/sender_canonical
+  # Soft override: Only replace if the sender is 'localhost' or a Docker internal ID
+  # This allows WordPress plugins to set their own valid 'From' address.
+  echo -e "/^From:.*@(localhost|[a-f0-9]{12})/ REPLACE From: $OVERWRITE_FROM" > /etc/postfix/smtp_header_checks
+  echo -e "/.*@(localhost|[a-f0-9]{12})/ $OVERWRITE_FROM" > /etc/postfix/sender_canonical
   postmap /etc/postfix/smtp_header_checks
   postmap /etc/postfix/sender_canonical
   postconf -e 'smtp_header_checks = regexp:/etc/postfix/smtp_header_checks'
   postconf -e 'sender_canonical_maps = regexp:/etc/postfix/sender_canonical'
-  echo "Setting configuration option OVERWRITE_FROM with value: ${OVERWRITE_FROM}"
+  echo "Setting configuration option OVERWRITE_FROM (Soft Override) with value: ${OVERWRITE_FROM}"
 fi
 
 # Set message_size_limit

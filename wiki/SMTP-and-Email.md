@@ -18,6 +18,11 @@ By setting the `SES_TENANT_TAG` environment variable in Dokploy, every email wil
 
 This allows you to track email usage per customer or environment within the AWS SES console.
 
+## 🔄 Soft Email Override
+The `OVERWRITE_FROM` environment variable in the `mail-relay` service is configured with a **"Soft Override"** logic:
+- **Fallback**: If an email is sent from a local address (e.g., `wordpress@localhost` or `nobody@localhost`), it will be automatically replaced with the `OVERWRITE_FROM` value to ensure it's accepted by your SMTP provider.
+- **Flexibility**: If a WordPress plugin sets a valid, external `From` address (e.g., `support@yourdomain.com`), the relay will **not** overwrite it. This allows you to use different sender addresses for different site functions.
+
 ## ⚙️ Zero-Plugin Setup
 You do **not** need to install plugins like WP Mail SMTP. 
 - Standalone PHP scripts using `mail()` use the container's internal `msmtp` client.

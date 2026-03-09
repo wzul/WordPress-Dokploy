@@ -36,6 +36,7 @@ This setup is designed specifically for **Dokploy** using the "Compose" service 
 | `SMTP_SERVER` | SMTP Relay Host (e.g. Amazon SES) | (Required) |
 | `SMTP_USERNAME` | SMTP Auth Username | (Required) |
 | `SMTP_PASSWORD` | SMTP Auth Password | (Required) |
+| `OVERWRITE_FROM`| Soft Email Overwrite (Required) | `(None)` |
 | `SERVER_HOSTNAME` | Your site domain (for Postfix EHLO) | `localhost` |
 | `SES_TENANT_TAG` | AWS SES Tenant ID for tagging | `default` |
 
