@@ -6,8 +6,7 @@ services:
       - ./php:/tmp/php:ro
       - ./ols:/tmp/ols:ro
     init: true
-    env_file:
-      - ./.env
+    env_file: - .env.
     environment:
       - ADMINER_DESIGN=${ADMINER_DESIGN:-pepa-linha}
       - OLS_PASSWORD=${OLS_PASSWORD:-admin123}
