@@ -28,4 +28,37 @@ To test if email is working, you can shell into the wordpress container and run:
 ```bash
 echo "Test message" | mail -s "Test Subject" recipient@example.com
 ```
-Check the `mail-relay` logs in Dokploy to see the delivery status.
+
+## 🔍 Monitoring & Troubleshooting via CLI
+
+While you can see logs in the Dokploy dashboard, you can also use the CLI for more detailed inspection:
+
+### 1. View Real-time Delivery Logs
+Use `docker logs` to see every handoff and SMTP response:
+```bash
+# Replace with your actual container name/ID
+docker logs -f wordpress-dokploy-mail-relay-1
+```
+**What to look for:**
+- `status=sent`: The email was successfully accepted by your SMTP relay.
+- `status=deferred`: The relay is retrying (common during SES rate-limiting).
+- `status=bounced`: The recipient address is invalid or the relay rejected it.
+
+### 2. Inspect the Mail Queue
+If emails aren't arriving, check if they are stuck in the local queue:
+```bash
+docker exec wordpress-dokploy-mail-relay-1 postqueue -p
+```
+*If this returns "Mail queue is empty", it means the email was already handed off or failed completely.*
+
+### 3. Flush the Queue
+To force a manual retry of all pending emails:
+```bash
+docker exec wordpress-dokploy-mail-relay-1 postqueue -f
+```
+
+### 4. Clear the Queue (Emergency)
+To delete all pending emails from the queue:
+```bash
+docker exec wordpress-dokploy-mail-relay-1 postsuper -d ALL
+```
