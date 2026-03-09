@@ -3,10 +3,10 @@ services:
     build: .
     volumes:
       - wp_app:/var/www/html
-      - ./php/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+      - ./php/uploads.ini:/tmp/uploads.ini.template:ro
       - ./php/opcache.ini:/usr/local/etc/php/conf.d/opcache.ini
       - ./php/mail.ini:/usr/local/etc/php/conf.d/mail.ini
-      - ./php/fpm-pool.conf:/usr/local/etc/php-fpm.d/zz-dokploy.conf
+      - ./php/fpm-pool.conf:/tmp/fpm-pool.conf.template:ro
       - ./php/msmtprc:/etc/msmtprc:ro
       - ./php/adminer-auth.php:/var/www/html/adminer-auth.php
     init: true
@@ -19,14 +19,22 @@ services:
   ols:
     image: litespeedtech/openlitespeed:latest
     command: >
-      sh -c " export FM_PATH=$${FILE_MANAGER_PATH:-/file-manager-secret} && export DB_PATH=$${DB_MANAGER_PATH:-/wp-db-admin} && export FM_PATH_SLASH=$${FM_PATH%/}/ && export FM_PATH_NO_SLASH=$${FM_PATH%/} &&
+      sh -c "
+      export FM_PATH=$${FILE_MANAGER_PATH:-/file-manager-secret} &&
+      export DB_PATH=$${DB_MANAGER_PATH:-/wp-db-admin} &&
+      export FM_PATH_SLASH=$${FM_PATH%/}/ &&
+      export FM_PATH_NO_SLASH=$${FM_PATH%/} &&
+      
+      cp /tmp/vhconf.conf.template /usr/local/lsws/conf/vhosts/localhost/vhconf.conf &&
+      sed -i \"s|FILE_MANAGER_PATH_PLACEHOLDER|$$FM_PATH_SLASH|g\" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf &&
+      sed -i \"s|FILE_MANAGER_PATH_STRIPPED|$$FM_PATH_NO_SLASH|g\" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf &&
+      sed -i \"s|DB_MANAGER_PATH_PLACEHOLDER|$$DB_PATH|g\" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf &&
 
-      # Inject secret paths safely into the mounted volume sed -i \"s|FILE_MANAGER_PATH_PLACEHOLDER|$$FM_PATH_SLASH|g\" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf && sed -i \"s|FILE_MANAGER_PATH_STRIPPED|$$FM_PATH_NO_SLASH|g\" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf && sed -i \"s|DB_MANAGER_PATH_PLACEHOLDER|$$DB_PATH|g\" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf &&
-
-      # Hand over to the official LiteSpeed entrypoint /entrypoint.sh "
+      /entrypoint.sh
+      "
     volumes:
       - wp_app:/var/www/html
-      - ./ols/vhosts/localhost/vhconf.conf:/usr/local/lsws/conf/vhosts/localhost/vhconf.conf
+      - ./ols/vhosts/localhost/vhconf.conf:/tmp/vhconf.conf.template:ro
       - ./ols/templates/docker.conf:/usr/local/lsws/conf/templates/docker.conf
     environment:
       - OLS_PASSWORD=${OLS_PASSWORD:-admin123}
