@@ -36,10 +36,27 @@ cat <<EOF > "$MU_PLUGINS/lscache-mu.php"
 <?php
 /*
 Plugin Name: LiteSpeed Cache (MU)
-Description: LiteSpeed Cache forced as a Must-Use plugin.
-Version: 1.0
+Description: LiteSpeed Cache forced as a Must-Use plugin and auto-configured for Valkey.
+Version: 1.1
 Author: Dokploy Integration
 */
+
+/**
+ * Auto-configure LiteSpeed Cache for Valkey (Redis)
+ * These constants override any settings in the database.
+ */
+if ( ! defined( 'LITESPEED_CONF__OBJECT' ) ) {
+    define( 'LITESPEED_CONF__OBJECT', true );
+}
+if ( ! defined( 'LITESPEED_CONF__OBJECT__KIND' ) ) {
+    define( 'LITESPEED_CONF__OBJECT__KIND', 1 ); // 1 = Redis
+}
+if ( ! defined( 'LITESPEED_CONF__OBJECT__HOST' ) ) {
+    define( 'LITESPEED_CONF__OBJECT__HOST', 'valkey' );
+}
+if ( ! defined( 'LITESPEED_CONF__OBJECT__PORT' ) ) {
+    define( 'LITESPEED_CONF__OBJECT__PORT', 6379 );
+}
 
 if (defined('WP_PLUGIN_DIR') && file_exists(WP_PLUGIN_DIR . '/litespeed-cache/litespeed-cache.php')) {
     require_once WP_PLUGIN_DIR . '/litespeed-cache/litespeed-cache.php';

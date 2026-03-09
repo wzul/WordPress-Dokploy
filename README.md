@@ -60,15 +60,10 @@ This setup automatically installs and enables the **LiteSpeed Cache** plugin as 
 
 ### Redis Object Cache
 > [!IMPORTANT]
-> **Do not install the separate "Redis Object Cache" plugin.**
-> LiteSpeed Cache has a built-in Object Cache feature that is fully compatible with the included Redis/Valkey service. Using both will cause conflicts and performance degradation.
+> **This setup is zero-config.**
+> LiteSpeed Cache is automatically configured to use the included `valkey` service for object caching. Do not install the separate "Redis Object Cache" plugin, as it will conflict with this built-in, pre-configured setup.
 >
-> To configure:
-> 1. Go to **LiteSpeed Cache > Settings > Object**.
-> 2. Enable **Object Cache**.
-> 3. Set Method to **Redis**.
-> 4. Host: `valkey` (as defined in `docker-compose.yml`).
-> 5. Port: `6379`.
+> You can verify the status under **LiteSpeed Cache > Settings > Object**. You should see that Object Cache is enabled and connected to the `valkey` host.
 
 ---
 

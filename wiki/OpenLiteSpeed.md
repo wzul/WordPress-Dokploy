@@ -14,16 +14,18 @@ OpenLiteSpeed comes with a powerful web-based administration panel.
 ## 🚀 LSCache
 The **LiteSpeed Cache** plugin is automatically installed as a **Must-Use (MU) plugin**. This ensures it is always active and cannot be deactivated via the WordPress dashboard.
 
-### 🛑 Important: Object Caching
-> [!WARNING]
-> **Do NOT use the "Redis Object Cache" plugin.**
+### 🛑 Zero-Config Object Caching
+> [!IMPORTANT]
+> **This setup is pre-configured.**
 >
-> LiteSpeed Cache replaces the need for any other Redis/Object Cache plugins. It includes its own highly optimized Object Cache module that is fully compatible with our `valkey` (Redis) service.
+> LiteSpeed Cache is automatically configured to use our `valkey` service. You do **NOT** need to perform any manual setup or install any other Redis plugins.
 >
-> **Configuration:**
+> **Forced Settings:**
 > - **Method:** Redis
 > - **Host:** `valkey`
 > - **Port:** `6379`
+>
+> These settings are injected via a Must-Use plugin and will override any changes made in the WordPress dashboard, ensuring the site always stays connected to the fastest available cache backend.
 
 ## 🔧 Architecture
 In this **unified setup**, OpenLiteSpeed and PHP are in the same container.
