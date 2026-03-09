@@ -20,23 +20,22 @@ services:
     image: litespeedtech/openlitespeed:latest
     command: >
       sh -c "
-      # Ensure OLS structure matches our volume
-      rm -rf /usr/local/lsws/Example/html &&
-      ln -s /var/www/html /usr/local/lsws/Example/html &&
-      
+      # 1. Modify Main Server Config
+      # Set VHost root to our shared volume, disable restraint, and map to all domains (*)
+      sed -i 's|vhRoot\s*Example/|vhRoot /var/www/html/|g' /usr/local/lsws/conf/httpd_config.conf &&
+      sed -i 's|restrained\s*1|restrained 0|g' /usr/local/lsws/conf/httpd_config.conf &&
+      sed -i 's|map\s*Example\s*localhost|map Example *|g' /usr/local/lsws/conf/httpd_config.conf &&
+
       export FM_PATH=$${FILE_MANAGER_PATH:-/file-manager-secret} &&
       export DB_PATH=$${DB_MANAGER_PATH:-/wp-db-admin} &&
       export FM_PATH_SLASH=$${FM_PATH%/}/ &&
       export FM_PATH_NO_SLASH=$${FM_PATH%/} &&
 
-      # Safe configuration injection
+      # 2. Safe VHost Configuration injection
       sed \"s|FILE_MANAGER_PATH_PLACEHOLDER|$$FM_PATH_SLASH|g\" /usr/local/lsws/conf/vhosts/Example/vhconf.conf > /tmp/vhconf.conf &&
       sed -i \"s|FILE_MANAGER_PATH_STRIPPED|$$FM_PATH_NO_SLASH|g\" /tmp/vhconf.conf &&
       sed -i \"s|DB_MANAGER_PATH_PLACEHOLDER|$$DB_PATH|g\" /tmp/vhconf.conf &&
       cat /tmp/vhconf.conf > /usr/local/lsws/conf/vhosts/Example/vhconf.conf &&
-
-      # Force the Default listener to map everything to the Example vhost
-      sed -i 's/map\s*Example\s*localhost/map Example */g' /usr/local/lsws/conf/httpd_config.conf &&
 
       /usr/local/lsws/bin/lswsctrl start &&
       tail -f /usr/local/lsws/logs/error.log
