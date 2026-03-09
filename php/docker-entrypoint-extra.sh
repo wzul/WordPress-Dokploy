@@ -23,6 +23,13 @@ if [ -f "/tmp/php/fpm-pool.conf" ]; then
         echo "" >> /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
         echo "; Make sure environment variables are passed to PHP" >> /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
         echo "clear_env = no" >> /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
+        echo "env[WORDPRESS_DB_HOST] = \${WORDPRESS_DB_HOST}" >> /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
+        echo "env[WORDPRESS_DB_USER] = \${WORDPRESS_DB_USER}" >> /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
+        echo "env[WORDPRESS_DB_PASSWORD] = \${WORDPRESS_DB_PASSWORD}" >> /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
+        echo "env[WORDPRESS_DB_NAME] = \${WORDPRESS_DB_NAME}" >> /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
+        echo "env[WORDPRESS_TABLE_PREFIX] = \${WORDPRESS_TABLE_PREFIX}" >> /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
+        echo "env[WORDPRESS_DEBUG] = \${WORDPRESS_DEBUG}" >> /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
+        echo "env[WORDPRESS_MEMORY_LIMIT] = \${WORDPRESS_MEMORY_LIMIT}" >> /usr/local/etc/php-fpm.d/zz-dokploy-dynamic.conf
     fi
 fi
 
