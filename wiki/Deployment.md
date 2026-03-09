@@ -15,18 +15,27 @@ This setup is designed specifically for **Dokploy** using the "Compose" service 
 1. Create a new **Project**.
 2. Click **Add Service** -> **Compose**.
 3. Point to your Git repository URL.
-4. **Environment Configuration (CRITICAL)**:
+4. **General Configuration**:
+   - Set **Compose Path** to `docker-compose.dokploy.yml`.
+5. **Environment Configuration (CRITICAL)**:
    > [!IMPORTANT]
    > Dokploy current cannot successfully inject host-level environment variables for the "Compose" service type. To manage your secrets:
    - Go to the **Files** tab of your service.
    - Create a new file manually named exactly **`env`** (without the dot).
    - Paste your configuration variables (e.g., `OLS_PASSWORD=...`) into this file.
-   - The `docker-compose.yml` is configured to read from this file natively.
-5. **Domain Mapping**:
+   - The `docker-compose.dokploy.yml` is configured to read from this file natively.
+6. **Domain Mapping**:
    - Go to the **Domains** tab.
    - **Main Site**: Add your domain (e.g., `mysite.com`) and point it to service **`wordpress`** on port **80**.
    - **OLS Admin (Optional)**: Add a subdomain (e.g., `ols.mysite.com`) and point it to service **`wordpress`** on port **7080**.
-6. **Deploy**: Click the **Deploy** button.
+7. **Deploy**: Click the **Deploy** button.
+
+## 💻 Local Testing
+To test the stack on your local machine before deploying:
+1. Copy `env.patch` provided in this repo.
+2. Run `docker-compose up -d`.
+3. Open `http://localhost:8080` for the WordPress site.
+4. Open `https://localhost:7080` for the OpenLiteSpeed Admin console.
 
 ## 🔑 Environment Variables
 
