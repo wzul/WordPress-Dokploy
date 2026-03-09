@@ -22,8 +22,7 @@ services:
       "
     env_file:
       - .env
-    linux_parameters:
-      init: true
+    init: true
     environment:
       - ADMINER_DESIGN=${ADMINER_DESIGN:-pepa-linha}
     restart: unless-stopped
