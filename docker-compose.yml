@@ -20,8 +20,7 @@ services:
     image: litespeedtech/openlitespeed:latest
     command: >
       sh -c "
-      # 1. Map all hostnames to the Example virtual host in the main listener
-      # This ensures dentaluna.my is not ignored by the web server
+      # 1. Map all hostnames to the Example virtual host
       sed -i 's/map\s*Example\s*localhost/map Example *, localhost/g' /usr/local/lsws/conf/httpd_config.conf &&
 
       export FM_PATH=$${FILE_MANAGER_PATH:-/file-manager-secret} &&
@@ -39,7 +38,7 @@ services:
       tail -f /usr/local/lsws/logs/error.log
       "
     volumes:
-      - wp_app:/var/www/html
+      - wp_app:/usr/local/lsws/Example/html
       - ./ols/vhconf.conf:/usr/local/lsws/conf/vhosts/Example/vhconf.conf
     environment:
       - OLS_PASSWORD=${OLS_PASSWORD:-admin123}
