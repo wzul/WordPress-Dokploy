@@ -7,13 +7,6 @@ services:
       - ./ols:/tmp/ols:ro
     init: true
     environment:
-      - WORDPRESS_DB_HOST=${WORDPRESS_DB_HOST}
-      - WORDPRESS_DB_USER=${WORDPRESS_DB_USER}
-      - WORDPRESS_DB_PASSWORD=${WORDPRESS_DB_PASSWORD}
-      - WORDPRESS_DB_NAME=${WORDPRESS_DB_NAME}
-      - WORDPRESS_TABLE_PREFIX=${WORDPRESS_TABLE_PREFIX}
-      - WORDPRESS_DEBUG=${WORDPRESS_DEBUG}
-      - WORDPRESS_MEMORY_LIMIT=${WORDPRESS_MEMORY_LIMIT:-256M}
       - ADMINER_DESIGN=${ADMINER_DESIGN:-pepa-linha}
       - OLS_PASSWORD=${OLS_PASSWORD:-admin123}
       - FILE_MANAGER_PATH=${FILE_MANAGER_PATH:-/file-manager-secret}
@@ -34,7 +27,7 @@ services:
   file-manager:
     image: filebrowser/filebrowser:latest
     user: "65534:65534"
-    entrypoint: ["sh", "-c"]
+    entrypoint: [ "sh", "-c" ]
     command: >
       "if [ ! -f /srv/.filebrowser.db ]; then
         filebrowser config init --database /srv/.filebrowser.db &&
