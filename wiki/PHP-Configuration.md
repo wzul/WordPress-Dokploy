@@ -19,24 +19,16 @@ Pre-configured with optimized settings for WordPress, including:
 - `opcache.memory_consumption=128`
 - `opcache.max_accelerated_files=4000`
 
-### 3. FPM Tuning (Performance vs Resources)
-You can choose how PHP management behaves depending on your server size:
+### 3. Native LSAPI Process Management
+Since this stack uses **OpenLiteSpeed + LSAPI**, you no longer need to manage complex PHP-FPM pools. 
 
-#### **`dynamic` (Default / High Performance)**
-PHP keeps specialized "spare" processes ready to handle requests instantly.
-- Best for: Sites with consistent traffic.
-- Variables: `PHP_FPM_START_SERVERS`, `PHP_FPM_MIN_SPARE_SERVERS`, etc.
+LiteSpeed handles process spawning and scaling natively:
+- **High Efficiency**: Processes communicate via lightning-fast local SAPIs rather than network-based FastCGI.
+- **Auto-Scaling**: LiteSpeed automatically adjusts the number of PHP workers based on incoming traffic.
+- **Resource Management**: In-built protection ensures that a spike in traffic won't crash your server by overloading individual PHP pools.
 
-#### **`ondemand` (Resource Saver)**
-PHP only spawns processes when a request actually arrives and kills them when idle.
-- Best for: Low-traffic sites or small VPS instances where RAM is tight.
-- Variable: Set `PHP_FPM_PM=ondemand`.
-
-> [!TIP]
-> All these values can be adjusted live in the Dokploy **Environment** settings. A redeploy will apply the new process management strategy.
-
-### 4. `fpm-pool.conf` (Process Management)
-Controls how many PHP processes are spawned. If you have a high-traffic site, you may want to increase `pm.max_children`.
+### 4. Direct Configuration
+If you need to adjust specific LiteSpeed PHP external processor settings (like `maxConns`), these can be modified in the **WebAdmin Console** (Port 7080) or via the global `httpd_config.conf` within the container.
 
 ## 🛠️ Modifying Settings via Dokploy
 You don't need to push a new commit to change these settings:

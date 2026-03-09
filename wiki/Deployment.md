@@ -17,8 +17,8 @@ This setup is designed specifically for **Dokploy** using the "Compose" service 
 3. Point to your Git repository URL.
 4. **Domain Mapping**:
    - Go to the **Domains** tab.
-   - **Main Site**: Add your domain (e.g., `mysite.com`) and point it to service `ols` on port **80**.
-   - **OLS Admin (Optional)**: Add a subdomain (e.g., `ols.mysite.com`) and point it to service `ols` on port **7080**.
+   - **Main Site**: Add your domain (e.g., `mysite.com`) and point it to service **`wordpress`** on port **80**.
+   - **OLS Admin (Optional)**: Add a subdomain (e.g., `ols.mysite.com`) and point it to service **`wordpress`** on port **7080**.
 5. **Environment Variables**:
    - Go to the **Environment** tab.
    - Add the variables listed in the table below.
@@ -34,6 +34,8 @@ This setup is designed specifically for **Dokploy** using the "Compose" service 
 | `WORDPRESS_DB_PASSWORD` | Database password | (Required) |
 | `WORDPRESS_MEMORY_LIMIT`| PHP Memory Limit | `256M` |
 | `OLS_PASSWORD` | Admin password for OpenLiteSpeed | `admin123` |
+| `DB_MANAGER_PATH` | Secret URL path for Adminer | `/wp-db-admin` |
+| `FILE_MANAGER_PATH` | Secret URL path for File Manager | `/file-manager-secret` |
 | `FILE_MANAGER_USER` | Admin user for File Manager | `admin` |
 | `FILE_MANAGER_PASSWORD` | Admin password for File Manager | (Required) |
 | `SMTP_SERVER` | SMTP Relay Host (e.g. Amazon SES) | (Required) |
@@ -45,7 +47,8 @@ This setup is designed specifically for **Dokploy** using the "Compose" service 
 ## 📁 Managing Volumes
 The system uses named volumes to ensure your data persists across redeployments:
 - `wp_app`: Persistent WordPress files (`/var/www/html`).
-- `filebrowser_db`: Persistent File Manager settings and users.
 
 ## 🗄️ Database Management
-This stack does not include a built-in database manager like phpMyAdmin. We recommend using a shared, external phpMyAdmin instance or a desktop client (like Sequel Ace, TablePlus, or DBeaver) to manage your database using the credentials provided in Dokploy.
+This stack includes **Adminer** as a built-in tool within the WordPress container. It is pre-configured with **WordPress Authentication Integration** to ensure only site administrators can access the database management interface. 
+
+For more details, see the [**Database Management Wiki**](Database-Management.md).
