@@ -23,6 +23,12 @@ if (!current_user_can('manage_options')) {
 }
 
 // 3. Define the Adminer logic
+// We define a fallback class to prevent Fatal Error if the single-file version
+// hasn't fully registered the global 'Adminer' class at this exact moment.
+if (!class_exists('Adminer')) {
+    class Adminer { }
+}
+
 function adminer_object() {
     class AdminerSoftware extends Adminer {
         /**
