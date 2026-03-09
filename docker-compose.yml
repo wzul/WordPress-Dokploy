@@ -23,36 +23,30 @@ services:
       # 1. Force Permissions for OLS (lshttpd)
       chown -R 999:999 /var/www/html &&
       
-      # 2. Map all hostnames to the Example virtual host
-      # This fixes 404s when accessing via real domains like dentaluna.my
-      sed -i 's/map\s*Example\s*[a-zA-Z0-9.,\s]*/map Example */g' /usr/local/lsws/conf/httpd_config.conf &&
-      
-      # 3. Set Virtual Host root directly to /var/www/html/ and disable restraint
-      sed -i 's|vhRoot\s*Example/|vhRoot /var/www/html/|g' /usr/local/lsws/conf/httpd_config.conf &&
-      sed -i 's|restrained\s*1|restrained 0|g' /usr/local/lsws/conf/httpd_config.conf &&
+      # 2. Fix OLS Virtual Host paths
+      # The default template uses vhRoot /var/www/vhosts/$$VH_NAME/
+      # We change it to /var/www/ so $$VH_ROOT/html becomes /var/www/html
+      sed -i 's|vhRoot.*|vhRoot /var/www/|g' /usr/local/lsws/conf/templates/docker.conf &&
+      sed -i 's|restrained\s*1|restrained 0|g' /usr/local/lsws/conf/templates/docker.conf &&
 
       export FM_PATH=$${FILE_MANAGER_PATH:-/file-manager-secret} &&
       export DB_PATH=$${DB_MANAGER_PATH:-/wp-db-admin} &&
       export FM_PATH_SLASH=$${FM_PATH%/}/ &&
       export FM_PATH_NO_SLASH=$${FM_PATH%/} &&
 
-      # 4. Inject secret paths into vhconf.conf safely
-      sed \"s|FILE_MANAGER_PATH_PLACEHOLDER|$$FM_PATH_SLASH|g\" /usr/local/lsws/conf/vhosts/Example/vhconf.conf > /tmp/vhconf.tmp &&
-      sed -i \"s|FILE_MANAGER_PATH_STRIPPED|$$FM_PATH_NO_SLASH|g\" /tmp/vhconf.tmp &&
-      sed -i \"s|DB_MANAGER_PATH_PLACEHOLDER|$$DB_PATH|g\" /tmp/vhconf.tmp &&
-      cat /tmp/vhconf.tmp > /usr/local/lsws/conf/vhosts/Example/vhconf.conf &&
-
-      # 5. Debug: Print file list to logs
-      echo '--- OLS WEB ROOT CONTENT ---' &&
-      ls -l /var/www/html &&
-      echo '---------------------------' &&
+      # 3. Inject secret paths and apply custom config to the 'localhost' vhost
+      mkdir -p /usr/local/lsws/conf/vhosts/localhost &&
+      sed \"s|FILE_MANAGER_PATH_PLACEHOLDER|$$FM_PATH_SLASH|g\" /tmp/custom_vhconf.conf > /usr/local/lsws/conf/vhosts/localhost/vhconf.conf &&
+      sed -i \"s|FILE_MANAGER_PATH_STRIPPED|$$FM_PATH_NO_SLASH|g\" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf &&
+      sed -i \"s|DB_MANAGER_PATH_PLACEHOLDER|$$DB_PATH|g\" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf &&
+      chown -R 999:999 /usr/local/lsws/conf/vhosts/localhost &&
 
       /usr/local/lsws/bin/lswsctrl start &&
       tail -f /usr/local/lsws/logs/error.log
       "
     volumes:
       - wp_app:/var/www/html
-      - ./ols/vhconf.conf:/usr/local/lsws/conf/vhosts/Example/vhconf.conf
+      - ./ols/vhconf.conf:/tmp/custom_vhconf.conf
     environment:
       - OLS_PASSWORD=${OLS_PASSWORD:-admin123}
       - FILE_MANAGER_PATH=${FILE_MANAGER_PATH:-/file-manager-secret}
