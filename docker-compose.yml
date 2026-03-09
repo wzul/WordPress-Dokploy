@@ -13,13 +13,7 @@ services:
 
   mail-relay:
     build: ./mail-relay
-    environment:
-      - SMTP_SERVER=${SMTP_SERVER}
-      - SMTP_PORT=${SMTP_PORT:-587}
-      - SMTP_USERNAME=${SMTP_USERNAME}
-      - SMTP_PASSWORD=${SMTP_PASSWORD}
-      - SERVER_HOSTNAME=${SERVER_HOSTNAME:-localhost}
-      - SES_TENANT_TAG=${SES_TENANT_TAG}
+    env_file: "env.patch"
     restart: unless-stopped
 
   valkey:
