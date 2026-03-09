@@ -11,12 +11,12 @@ services:
       - ./php/docker-entrypoint-extra.sh:/usr/local/bin/docker-entrypoint-extra.sh:ro
       - ./ols:/tmp/ols:ro
     init: true
-    env_file: "env.patch"
+    env_file: "env"
     restart: unless-stopped
 
   mail-relay:
     build: ./mail-relay
-    env_file: "env.patch"
+    env_file: "env"
     restart: unless-stopped
 
   valkey:

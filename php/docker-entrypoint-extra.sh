@@ -21,10 +21,7 @@ mkdir -p /tmp/opcache_file_cache
 chown -R nobody:nogroup /tmp/opcache_file_cache
 
 # Apply PHP configurations from safe mounted directory
-if [ -f "/tmp/php/uploads.ini" ]; then
-    cp /tmp/php/uploads.ini "$PHP_MODS_DIR/99-uploads-dynamic.ini"
-    sed -i "s/WORDPRESS_MEMORY_LIMIT_PLACEHOLDER/${WORDPRESS_MEMORY_LIMIT:-256M}/g" "$PHP_MODS_DIR/99-uploads-dynamic.ini"
-fi
+[ -f "/tmp/php/uploads.ini" ] && cp -p /tmp/php/uploads.ini "$PHP_MODS_DIR/99-uploads-dynamic.ini" 2>/dev/null || true
 
 [ -f "/tmp/php/opcache.ini" ] && cp -p /tmp/php/opcache.ini "$PHP_MODS_DIR/99-opcache.ini" 2>/dev/null || true
 [ -f "/tmp/php/mail.ini" ] && cp -p /tmp/php/mail.ini "$PHP_MODS_DIR/99-mail.ini" 2>/dev/null || true
