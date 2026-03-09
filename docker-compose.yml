@@ -9,20 +9,9 @@ services:
       - ./php/fpm-pool.conf:/usr/local/etc/php-fpm.d/zz-dokploy.conf
       - ./php/msmtprc:/etc/msmtprc:ro
       - ./php/adminer-auth.php:/var/www/html/adminer-auth.php
-    command: >
-      sh -c "
-      sed -i 's/WORDPRESS_MEMORY_LIMIT_PLACEHOLDER/$${WORDPRESS_MEMORY_LIMIT:-256M}/g' /usr/local/etc/php/conf.d/uploads.ini &&
-      sed -i 's/FPM_PM_TYPE_PLACEHOLDER/$${PHP_FPM_PM:-dynamic}/g' /usr/local/etc/php-fpm.d/zz-dokploy.conf &&
-      sed -i 's/FPM_MAX_CHILDREN_PLACEHOLDER/$${PHP_FPM_MAX_CHILDREN:-5}/g' /usr/local/etc/php-fpm.d/zz-dokploy.conf &&
-      sed -i 's/FPM_START_SERVERS_PLACEHOLDER/$${PHP_FPM_START_SERVERS:-1}/g' /usr/local/etc/php-fpm.d/zz-dokploy.conf &&
-      sed -i 's/FPM_MIN_SPARE_SERVERS_PLACEHOLDER/$${PHP_FPM_MIN_SPARE_SERVERS:-1}/g' /usr/local/etc/php-fpm.d/zz-dokploy.conf &&
-      sed -i 's/FPM_MAX_SPARE_SERVERS_PLACEHOLDER/$${PHP_FPM_MAX_SPARE_SERVERS:-2}/g' /usr/local/etc/php-fpm.d/zz-dokploy.conf &&
-      sed -i 's/FPM_IDLE_TIMEOUT_PLACEHOLDER/$${PHP_FPM_IDLE_TIMEOUT:-10s}/g' /usr/local/etc/php-fpm.d/zz-dokploy.conf &&
-      /usr/local/bin/docker-entrypoint.sh php-fpm
-      "
+    init: true
     env_file:
       - .env
-    init: true
     environment:
       - ADMINER_DESIGN=${ADMINER_DESIGN:-pepa-linha}
     restart: unless-stopped
