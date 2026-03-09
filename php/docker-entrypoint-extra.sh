@@ -15,12 +15,13 @@ fi
 
 # 2. Inject environment variables for LiteSpeed PHP settings into LSAPI
 PHP_MODS_DIR="/usr/local/lsws/lsphp84/etc/php/8.4/mods-available"
-if [ -f "/tmp/php/uploads.ini" ] && [ -d "$PHP_MODS_DIR" ]; then
+
+# Apply PHP configurations from safe mounted directory
+if [ -f "/tmp/php/uploads.ini" ]; then
     cp /tmp/php/uploads.ini "$PHP_MODS_DIR/99-uploads-dynamic.ini"
     sed -i "s/WORDPRESS_MEMORY_LIMIT_PLACEHOLDER/${WORDPRESS_MEMORY_LIMIT:-256M}/g" "$PHP_MODS_DIR/99-uploads-dynamic.ini"
 fi
 
-# Apply other static PHP configurations if they exist
 [ -f "/tmp/php/opcache.ini" ] && cp -p /tmp/php/opcache.ini "$PHP_MODS_DIR/99-opcache.ini" 2>/dev/null || true
 [ -f "/tmp/php/mail.ini" ] && cp -p /tmp/php/mail.ini "$PHP_MODS_DIR/99-mail.ini" 2>/dev/null || true
 [ -f "/tmp/php/msmtprc" ] && cp -p /tmp/php/msmtprc /etc/msmtprc 2>/dev/null || true

@@ -15,9 +15,15 @@ Adjust this file to change:
 > **Synchronized Memory Limit**: You don't need to edit `uploads.ini` to change the RAM limit. Simply set the `WORDPRESS_MEMORY_LIMIT` environment variable in Dokploy. The system will automatically update both your **PHP `memory_limit`** and the **WordPress `WP_MEMORY_LIMIT`** to match that value!
 
 ### 2. `opcache.ini` (Performance)
-Pre-configured with optimized settings for WordPress, including:
+Pre-configured with optimized settings for WordPress. You can easily "patch" or override these settings directly from the Dokploy dashboard by editing the file in the `php/` directory.
+
+Key settings include:
 - `opcache.memory_consumption=128`
-- `opcache.max_accelerated_files=4000`
+- `opcache.max_accelerated_files=10000`
+- `opcache.revalidate_freq=2`
+
+> [!TIP]
+> **Production vs Development**: For a production site where code rarely changes, you can increase `opcache.revalidate_freq` to `60` or more to gain extra performance.
 
 ### 3. Native LSAPI Process Management
 Since this stack uses **OpenLiteSpeed + LSAPI**, you no longer need to manage complex PHP-FPM pools. 
