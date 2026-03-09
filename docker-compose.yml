@@ -7,7 +7,7 @@ services:
       - ./ols:/tmp/ols:ro
     init: true
     env_file:
-      - .env
+      - ./.env
     environment:
       - ADMINER_DESIGN=${ADMINER_DESIGN:-pepa-linha}
       - OLS_PASSWORD=${OLS_PASSWORD:-admin123}
