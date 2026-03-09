@@ -16,6 +16,10 @@ fi
 # 2. Inject environment variables for LiteSpeed PHP settings into LSAPI
 PHP_MODS_DIR="/usr/local/lsws/lsphp84/etc/php/8.4/mods-available"
 
+# Ensure Opcache File Cache directory exists and is writable
+mkdir -p /tmp/opcache_file_cache
+chown -R nobody:nogroup /tmp/opcache_file_cache
+
 # Apply PHP configurations from safe mounted directory
 if [ -f "/tmp/php/uploads.ini" ]; then
     cp /tmp/php/uploads.ini "$PHP_MODS_DIR/99-uploads-dynamic.ini"
