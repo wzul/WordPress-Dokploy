@@ -34,6 +34,11 @@ fi
 # 3. Handle OpenLiteSpeed configuration
 FM_PATH=${FILE_MANAGER_PATH:-/file-manager-secret}
 DB_PATH=${DB_MANAGER_PATH:-/wp-db-admin}
+
+# Strip leading slashes for OLS Rewrite Rule patterns (which don't use them)
+FM_PATH_CLEAN=${FM_PATH#/}
+DB_PATH_CLEAN=${DB_PATH#/}
+
 FM_PATH_SLASH=${FM_PATH%/}/
 FM_PATH_NO_SLASH=${FM_PATH%/}
 
@@ -41,8 +46,8 @@ if [ -f "/tmp/ols/vhosts/localhost/vhconf.conf" ]; then
     mkdir -p /usr/local/lsws/conf/vhosts/localhost/
     cp /tmp/ols/vhosts/localhost/vhconf.conf /usr/local/lsws/conf/vhosts/localhost/vhconf.conf
     sed -i "s|FILE_MANAGER_PATH_PLACEHOLDER|$FM_PATH_SLASH|g" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf
-    sed -i "s|FILE_MANAGER_PATH_STRIPPED|$FM_PATH_NO_SLASH|g" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf
-    sed -i "s|DB_MANAGER_PATH_PLACEHOLDER|$DB_PATH|g" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf
+    sed -i "s|FILE_MANAGER_PATH_STRIPPED|$FM_PATH_CLEAN|g" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf
+    sed -i "s|DB_MANAGER_PATH_PLACEHOLDER|$DB_PATH_CLEAN|g" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf
 fi
 
 if [ -f "/tmp/ols/templates/docker.conf" ]; then
