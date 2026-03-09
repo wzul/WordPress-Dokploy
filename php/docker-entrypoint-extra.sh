@@ -91,6 +91,21 @@ if [ -f "/tmp/ols/templates/docker.conf" ]; then
     cp /tmp/ols/templates/docker.conf /usr/local/lsws/conf/templates/docker.conf
 fi
 
+# 5. Configure WordPress (wp-config.php)
+WP_CONFIG="/var/www/html/wp-config.php"
+if [ -f "$WP_CONFIG" ]; then
+    if [ "$DISABLE_WP_CRON" = "true" ]; then
+        if ! grep -q "DISABLE_WP_CRON" "$WP_CONFIG"; then
+            echo "Disabling internal WordPress cron in wp-config.php..."
+            # Insert before the "stop editing" line
+            sed -i "/\* That's all, stop editing!/i define('DISABLE_WP_CRON', true);" "$WP_CONFIG"
+        fi
+    else
+        # If explicitly set to false, ensure it's removed or set to false
+        sed -i "/define('DISABLE_WP_CRON', true);/d" "$WP_CONFIG"
+    fi
+fi
+
 # Ensure everything is owned by nobody:nogroup
 chown -R nobody:nogroup /var/www/html
 
