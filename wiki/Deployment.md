@@ -9,7 +9,7 @@ This setup is designed specifically for **Dokploy** using the "Compose" service 
 ## 2. Deployment Steps
 
 ### In your Git Provider:
-1. Ensure your `.env` is NOT committed (use `.env.example` as a template).
+1. Ensure your `env` is NOT committed (use `env.example` as a template).
 
 ### In Dokploy:
 1. Create a new **Project**.
