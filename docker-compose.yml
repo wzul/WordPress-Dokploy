@@ -19,34 +19,15 @@ services:
   ols:
     image: litespeedtech/openlitespeed:latest
     command: >
-      sh -c "
-      # 1. Force Permissions for OLS (lshttpd)
-      chown -R 999:999 /var/www/html &&
-      
-      # 2. Fix OLS Virtual Host paths
-      # The default template uses vhRoot /var/www/vhosts/$$VH_NAME/
-      # We change it to /var/www/ so $$VH_ROOT/html becomes /var/www/html
-      sed -i 's|vhRoot.*|vhRoot /var/www/|g' /usr/local/lsws/conf/templates/docker.conf &&
-      sed -i 's|restrained\s*1|restrained 0|g' /usr/local/lsws/conf/templates/docker.conf &&
+      sh -c " export FM_PATH=$${FILE_MANAGER_PATH:-/file-manager-secret} && export DB_PATH=$${DB_MANAGER_PATH:-/wp-db-admin} && export FM_PATH_SLASH=$${FM_PATH%/}/ && export FM_PATH_NO_SLASH=$${FM_PATH%/} &&
 
-      export FM_PATH=$${FILE_MANAGER_PATH:-/file-manager-secret} &&
-      export DB_PATH=$${DB_MANAGER_PATH:-/wp-db-admin} &&
-      export FM_PATH_SLASH=$${FM_PATH%/}/ &&
-      export FM_PATH_NO_SLASH=$${FM_PATH%/} &&
+      # Inject secret paths safely into the mounted volume sed -i \"s|FILE_MANAGER_PATH_PLACEHOLDER|$$FM_PATH_SLASH|g\" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf && sed -i \"s|FILE_MANAGER_PATH_STRIPPED|$$FM_PATH_NO_SLASH|g\" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf && sed -i \"s|DB_MANAGER_PATH_PLACEHOLDER|$$DB_PATH|g\" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf &&
 
-      # 3. Inject secret paths and apply custom config to the 'localhost' vhost
-      mkdir -p /usr/local/lsws/conf/vhosts/localhost &&
-      sed \"s|FILE_MANAGER_PATH_PLACEHOLDER|$$FM_PATH_SLASH|g\" /tmp/custom_vhconf.conf > /usr/local/lsws/conf/vhosts/localhost/vhconf.conf &&
-      sed -i \"s|FILE_MANAGER_PATH_STRIPPED|$$FM_PATH_NO_SLASH|g\" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf &&
-      sed -i \"s|DB_MANAGER_PATH_PLACEHOLDER|$$DB_PATH|g\" /usr/local/lsws/conf/vhosts/localhost/vhconf.conf &&
-      chown -R 999:999 /usr/local/lsws/conf/vhosts/localhost &&
-
-      /usr/local/lsws/bin/lswsctrl start &&
-      tail -f /usr/local/lsws/logs/error.log
-      "
+      # Hand over to the official LiteSpeed entrypoint /entrypoint.sh "
     volumes:
       - wp_app:/var/www/html
-      - ./ols/vhconf.conf:/tmp/custom_vhconf.conf
+      - ./ols/vhosts/localhost/vhconf.conf:/usr/local/lsws/conf/vhosts/localhost/vhconf.conf
+      - ./ols/templates/docker.conf:/usr/local/lsws/conf/templates/docker.conf
     environment:
       - OLS_PASSWORD=${OLS_PASSWORD:-admin123}
       - FILE_MANAGER_PATH=${FILE_MANAGER_PATH:-/file-manager-secret}
@@ -70,14 +51,11 @@ services:
     image: filebrowser/filebrowser:latest
     user: "33:33"
     command: >
-      sh -c "
-      if [ ! -f /database/filebrowser.db ]; then
+      sh -c " if [ ! -f /database/filebrowser.db ]; then
         /filebrowser config init --database /database/filebrowser.db &&
         /filebrowser config set --database /database/filebrowser.db --baseurl /file-manager &&
         /filebrowser users add $${FILE_MANAGER_USER:-admin} $${FILE_MANAGER_PASSWORD:-admin123} --perm.admin --database /database/filebrowser.db
-      fi &&
-      /filebrowser server --database /database/filebrowser.db
-      "
+      fi && /filebrowser server --database /database/filebrowser.db "
     volumes:
       - wp_app:/srv
       - filebrowser_db:/database
