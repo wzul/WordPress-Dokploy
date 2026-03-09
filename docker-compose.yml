@@ -9,8 +9,6 @@ services:
       - ./ols:/tmp/ols:ro
     init: true
     env_file: "env.patch"
-    environment:
-      - OLS_PASSWORD=${OLS_PASSWORD:-admin123}
     restart: unless-stopped
 
   mail-relay:
