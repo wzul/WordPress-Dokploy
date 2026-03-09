@@ -23,14 +23,22 @@ if (!current_user_can('manage_options')) {
 }
 
 // 3. Define the Adminer logic
-// We define a fallback class with common methods to prevent Fatal Errors
-// during execution of single-file Adminer versions.
+// We define a fallback class with correctly typed methods to prevent Fatal Errors
+// during the early execution phase of single-file Adminer versions.
 if (!class_exists('Adminer')) {
     class Adminer {
+        function name() { return 'Database Manager'; }
         function credentials() { return [DB_HOST, DB_USER, DB_PASSWORD]; }
         function login($login, $password) { return true; }
+        function loginForm() { return true; }
         function database() { return DB_NAME; }
+        function css() { return []; }
         function csp() { return []; }
+        function headers() { return true; }
+        function head() { return true; }
+        function bodyClass() { return ''; }
+        function navigation($xf) { return ''; }
+        function selectLinks($Jh, $o = null) { return ''; }
         function __call($name, $args) { return null; }
     }
 }
