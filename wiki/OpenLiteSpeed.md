@@ -6,7 +6,6 @@ This stack uses **OpenLiteSpeed (OLS)**, the open-source version of LiteSpeed En
 OpenLiteSpeed comes with a powerful web-based administration panel.
 
 - **Internal Port**: `7080`
-- **Internal Port**: `7080`
 - **Dokploy Setup**: Add a domain mapping in Dokploy to the **`wordpress`** service on port **7080**.
 - **User**: `admin`
 - **Password**: The value of `OLS_PASSWORD` in your Dokploy settings.
