@@ -100,6 +100,11 @@ if [ -f "$HTTPD_CONF" ]; then
     # 1. Enable header detection (X-Forwarded-For)
     sed -i "s/useIpInProxyHeader.*/useIpInProxyHeader 1/" "$HTTPD_CONF"
     
+    # Ensure OLS recognizes Cloudflare headers specifically
+    if ! grep -q "extAppIpFromHeader" "$HTTPD_CONF"; then
+        sed -i "/useIpInProxyHeader/a \  extAppIpFromHeader      1" "$HTTPD_CONF"
+    fi
+    
     # 2. Fetch Trusted Cloudflare & Local IPs dynamically
     echo "Fetching latest Cloudflare IP ranges from official API..."
     CF_IPS_JSON=$(curl -s --connect-timeout 5 "https://api.cloudflare.com/client/v4/ips")
