@@ -5,8 +5,8 @@ db_password = "${password:32}"
 
 [config]
 env = [
-  # Database Configuration
-  "WORDPRESS_DB_HOST=mysql:3306",
+  # Database Configuration (Points to Internal Managed MariaDB)
+  "WORDPRESS_DB_HOST=wp_db",
   "WORDPRESS_DB_NAME=wordpress",
   "WORDPRESS_DB_USER=wordpress",
   "WORDPRESS_DB_PASSWORD=${db_password}",
@@ -49,3 +49,12 @@ host = "${main_domain}"
 serviceName = "wordpress"
 port = 7080
 host = "ols.${main_domain}"
+
+# Managed MariaDB Setup
+[[config.mariadb]]
+name = "WordPress DB"
+appName = "wp_db"
+databaseName = "wordpress"
+databaseUser = "wordpress"
+databasePassword = "${db_password}"
+dockerImage = "mariadb:latest"
