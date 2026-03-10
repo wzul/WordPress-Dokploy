@@ -20,6 +20,7 @@ The system consists of three primary services orchestrated via Docker Compose:
 - [**Advanced Cloudflare Setup**](Advanced-Cloudflare-Integration.md): Lockdown your server to ONLY allow Cloudflare traffic.
 - [**Fail2Ban (IP Blocking)**](Fail2Ban-Setup.md): Prevent brute-force by blocking IPs at the Cloudflare edge.
 - [**Cron & Scheduled Tasks**](Cron-Management.md): How WordPress cron is handled by the Dokploy Scheduler.
+- [**Performance Testing**](Performance-Testing.md): How to audit your site speed using sitespeed.io.
 
 ## 🛠️ Key Features
 

@@ -106,6 +106,16 @@ OpenLiteSpeed is a high-performance HTTP server that handles massive concurrency
 
 ---
 
+## ⚡ Performance Auditing
+You can test your site's speed using **sitespeed.io** via Docker. This will provide you with a comprehensive report on PageSpeed, Core Web Vitals, and more.
+
+```bash
+docker run --rm -v "$(pwd):/sitespeed.io" sitespeedio/sitespeed.io:39.4.2 https://your-domain.com/
+```
+- See the [**Performance Testing Wiki**](wiki/Performance-Testing.md) for more details.
+
+---
+
 ## Accessing the OLS Admin Panel
 You can access the OLS WebAdmin console on port **7080**.
 
