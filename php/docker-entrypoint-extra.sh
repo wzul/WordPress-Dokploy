@@ -42,6 +42,14 @@ Author: Dokploy Integration
 */
 
 /**
+ * Handle Cloudflare Real IP
+ * This ensures WordPress sees the actual visitor IP in $_SERVER['REMOTE_ADDR']
+ */
+if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+    $_SERVER['REMOTE_ADDR'] = $_SERVER['HTTP_CF_CONNECTING_IP'];
+}
+
+/**
  * Auto-configure LiteSpeed Cache for Valkey (Redis)
  * These constants override any settings in the database.
  */

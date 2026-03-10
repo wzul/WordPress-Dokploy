@@ -28,4 +28,4 @@ The **Mail Relay** sidecar only allows connections from within the internal Dock
 If you want the highest level of protection, we highly recommend using **Cloudflare** as your DNS provider:
 - **WAF (Web Application Firewall)**: Blocks known bot signatures.
 - **Bot Fight Mode**: Challenges suspicious automated traffic.
-- **IP Access Rules**: You can restrict the `/wp-admin/` and your secret file-manager path to ONLY allow your home/office IP address.
+- **Edge Protection**: See our [Advanced Cloudflare Integration](Advanced-Cloudflare-Integration.md) guide to lockdown your server so it ONLY accepts traffic from Cloudflare IPs.
