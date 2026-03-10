@@ -13,6 +13,9 @@ This repository contains a WordPress setup optimized for deployment via [Dokploy
 
 ## 🚀 Deployment Instructions
 
+> [!NOTE]
+> For a more detailed step-by-step guide, see our **[Deployment Guide Wiki](wiki/Deployment.md)**.
+
 ### 1. Git Repository Deployment (Recommended)
 This is the most professional way to deploy, as it allows for easy updates and version control directly in Dokploy.
 
@@ -22,7 +25,7 @@ This is the most professional way to deploy, as it allows for easy updates and v
 4.  **Configuration**:
     *   **Branch**: `main`
     *   **Compose Path**: `./docker-compose.yml`
-5.  **Environment**: Add your `.env` variables in the Environment tab.
+5.  **Environment**: Add your environment variables in the **Environment** tab. You can find all available options and defaults in the [**.env.example**](.env.example) file.
 6.  **Deploy**: Hit the **Deploy** button!
 
 ---
@@ -33,6 +36,7 @@ If you just want to copy-paste the configuration without linking a repository:
 1.  **In Dokploy**: Select **Add Service > Compose**.
 2.  **Setup**: Select the **"Raw"** input type.
 3.  **Paste**: Copy and paste the following block into the editor:
+4.  **Environment**: Don't forget to add your variables from the [**.env.example**](.env.example) file in the **Environment** tab.
 
 ```yaml
 services:
