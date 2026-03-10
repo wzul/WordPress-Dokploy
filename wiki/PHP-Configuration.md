@@ -18,12 +18,12 @@ Adjust this file to change:
 Pre-configured with optimized settings for WordPress. You can easily "patch" or override these settings directly from the Dokploy dashboard by editing the file in the `php/` directory.
 
 Key settings include:
-- `opcache.memory_consumption=128`
-- `opcache.max_accelerated_files=10000`
-- `opcache.revalidate_freq=2`
+- `opcache.memory_consumption=256`
+- `opcache.max_accelerated_files=15000`
+- `opcache.revalidate_freq=300`
 
 > [!TIP]
-> **Production vs Development**: For a production site where code rarely changes, you can increase `opcache.revalidate_freq` to `60` or more to gain extra performance.
+> **Production vs Development**: These values are currently optimized for a production environment where code changes infrequently (`revalidate_freq=300`). For active development, you may want to decrease `revalidate_freq` to `2`.
 
 ### 3. Native LSAPI Process Management
 Since this stack uses **OpenLiteSpeed + LSAPI**, you no longer need to manage complex PHP-FPM pools. 
@@ -39,6 +39,6 @@ If you need to adjust specific LiteSpeed PHP external processor settings (like `
 ## 🛠️ Modifying Settings via Dokploy
 You don't need to push a new commit to change these settings:
 1. Go to the **WordPress service** in Dokploy.
-2. Navigate to the **Files** tab.
-3. Edit the file (e.g., `/usr/local/etc/php/conf.d/uploads.ini`).
-4. Click **Save and Redeploy**.
+2. Navigate to the **Patches** tab.
+3. Add a patch for the file you want to override (e.g., `/usr/local/lsws/lsphp84/etc/php/8.4/mods-available/99-uploads-dynamic.ini`).
+4. Click **Deploy**.
