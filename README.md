@@ -13,12 +13,26 @@ This repository contains a WordPress setup optimized for deployment via [Dokploy
 
 ## 🚀 Deployment Instructions
 
-### 1. Manual "Raw YAML" Deployment (Recommended)
-You can deploy this entire highly-optimized stack in seconds without manually cloning or building any images:
+### 1. Git Repository Deployment (Recommended)
+This is the most professional way to deploy, as it allows for easy updates and version control directly in Dokploy.
 
-1. **In Dokploy**: Navigate to your Project and select **Add Service > Compose**.
-2. **Setup**: Select the **"Raw"** input type.
-3. **Paste**: Copy and paste the following block:
+1.  **In Dokploy**: Navigate to your Project and select **Add Service > Compose**.
+2.  **Source**: Select the **"Git"** input type.
+3.  **Repository**: Paste `https://github.com/wzul/WordPress-Dokploy`.
+4.  **Configuration**:
+    *   **Branch**: `main`
+    *   **Compose Path**: `./docker-compose.yml`
+5.  **Environment**: Add your `.env` variables in the Environment tab.
+6.  **Deploy**: Hit the **Deploy** button!
+
+---
+
+### 2. Manual "Raw YAML" Deployment
+If you just want to copy-paste the configuration without linking a repository:
+
+1.  **In Dokploy**: Select **Add Service > Compose**.
+2.  **Setup**: Select the **"Raw"** input type.
+3.  **Paste**: Copy and paste the following block into the editor:
 
 ```yaml
 services:
