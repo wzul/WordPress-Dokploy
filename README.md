@@ -22,7 +22,7 @@ You can deploy this entire highly-optimized stack in seconds without manually cl
 ```yaml
 services:
   wordpress:
-    image: ghcr.io/wanzulkarnain/wordpress-dokploy:latest
+    image: ghcr.io/wzul/wordpress-dokploy:latest
     volumes:
       - wp_app:/var/www/html
     init: true
@@ -30,7 +30,7 @@ services:
     restart: unless-stopped
 
   mail-relay:
-    image: ghcr.io/wanzulkarnain/wordpress-dokploy-mail-relay:latest
+    image: ghcr.io/wzul/wordpress-dokploy-mail-relay:latest
     env_file: ".env"
     restart: unless-stopped
 
