@@ -13,8 +13,20 @@ RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli
     echo '#!/bin/bash\nphp /usr/local/bin/wp-cli.phar "$@" --allow-root' > /usr/local/bin/wp && \
     chmod +x /usr/local/bin/wp
 
-# Default PHP/WordPress Performance
+# Default PHP Performance & Limits
 ENV WORDPRESS_MEMORY_LIMIT=256M
+ENV WORDPRESS_UPLOAD_LIMIT=64M
+ENV WORDPRESS_MAX_EXECUTION_TIME=300
+ENV WORDPRESS_MAX_INPUT_VARS=3000
+
+# Default Opcache Settings
+ENV OPCACHE_ENABLE=1
+ENV OPCACHE_MEMORY_CONSUMPTION=256
+ENV OPCACHE_INTERNED_STRINGS_BUFFER=8
+ENV OPCACHE_MAX_ACCELERATED_FILES=15000
+ENV OPCACHE_REVALIDATE_FREQ=300
+ENV OPCACHE_FAST_SHUTDOWN=1
+
 ENV DISABLE_WP_CRON=true
 
 # Default Admin Setup for OpenLiteSpeed

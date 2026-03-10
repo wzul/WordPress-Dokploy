@@ -1,15 +1,11 @@
 services:
   wordpress:
     build: .
-    entrypoint: [ "bash", "/usr/local/bin/docker-entrypoint-extra.sh" ]
     ports:
       - "8080:80"
       - "7080:7080"
     volumes:
       - wp_app:/var/www/html
-      - ./php:/tmp/php:ro
-      - ./php/docker-entrypoint-extra.sh:/usr/local/bin/docker-entrypoint-extra.sh:ro
-      - ./ols:/tmp/ols:ro
     init: true
     env_file: ".env"
     restart: unless-stopped

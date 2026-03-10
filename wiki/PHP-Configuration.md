@@ -2,28 +2,26 @@
 
 We have exposed several configuration points to make PHP tuning easy.
 
-## 📁 Configuration Directory (`php/`)
-Files in the `php/` directory are mounted into the WordPress container at startup.
+## 🌍 Environment-Driven Configuration
+To keep the application highly scalable and maintainable, this stack uses a **12-Factor App approach**. You do not need to edit or mount any `.ini` files. 
 
-### 1. `uploads.ini` (Limits)
-Adjust this file to change:
-- `upload_max_filesize`
-- `post_max_size`
-- `max_execution_time`
+All PHP and Opcache settings are dynamically injected at container startup using Environment Variables.
 
-> [!TIP]
-> **Synchronized Memory Limit**: You don't need to edit `uploads.ini` to change the RAM limit. Simply set the `WORDPRESS_MEMORY_LIMIT` environment variable in Dokploy. The system will automatically update both your **PHP `memory_limit`** and the **WordPress `WP_MEMORY_LIMIT`** to match that value!
+### 1. PHP Limits
+Add the following keys to your Dokploy **Environment** tab to adjust typical limits:
+- `WORDPRESS_MEMORY_LIMIT` (Default: `256M`)
+- `WORDPRESS_UPLOAD_LIMIT` (Default: `64M`) - Controls both `upload_max_filesize` and `post_max_size`
+- `WORDPRESS_MAX_EXECUTION_TIME` (Default: `300`)
+- `WORDPRESS_MAX_INPUT_VARS` (Default: `3000`)
 
-### 2. `opcache.ini` (Performance)
-Pre-configured with optimized settings for WordPress. You can easily "patch" or override these settings directly from the Dokploy dashboard by editing the file in the `php/` directory.
-
-Key settings include:
-- `opcache.memory_consumption=256`
-- `opcache.max_accelerated_files=15000`
-- `opcache.revalidate_freq=300`
+### 2. Opcache (Performance)
+The stack comes pre-configured with highly tuned settings for WordPress production. You can override these via the exact same method:
+- `OPCACHE_MEMORY_CONSUMPTION` (Default: `256`)
+- `OPCACHE_MAX_ACCELERATED_FILES` (Default: `15000`)
+- `OPCACHE_REVALIDATE_FREQ` (Default: `300`)
 
 > [!TIP]
-> **Production vs Development**: These values are currently optimized for a production environment where code changes infrequently (`revalidate_freq=300`). For active development, you may want to decrease `revalidate_freq` to `2`.
+> **Production vs Development**: These values are optimized for production where code rarely changes (`revalidate_freq=300` means PHP only checks for modified files every 5 minutes). For active development, you may want to set `OPCACHE_REVALIDATE_FREQ` to `2`.
 
 ### 3. Native LSAPI Process Management
 Since this stack uses **OpenLiteSpeed + LSAPI**, you no longer need to manage complex PHP-FPM pools. 
@@ -37,8 +35,10 @@ LiteSpeed handles process spawning and scaling natively:
 If you need to adjust specific LiteSpeed PHP external processor settings (like `maxConns`), these can be modified in the **WebAdmin Console** (Port 7080) or via the global `httpd_config.conf` within the container.
 
 ## 🛠️ Modifying Settings via Dokploy
-You don't need to push a new commit to change these settings:
+You don't need to push a new commit or SSH into the server to change these settings:
 1. Go to the **WordPress service** in Dokploy.
-2. Navigate to the **Patches** tab.
-3. Add a patch for the file you want to override (e.g., `/usr/local/lsws/lsphp84/etc/php/8.4/mods-available/99-uploads-dynamic.ini`).
+2. Navigate to the **Environment** tab.
+3. Add a new variable (e.g., Key: `WORDPRESS_UPLOAD_LIMIT`, Value: `128M`).
 4. Click **Deploy**.
+
+Upon restart, the entrypoint script will instantly rebuild your PHP configurations perfectly.

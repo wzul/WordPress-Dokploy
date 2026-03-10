@@ -78,33 +78,161 @@ PHP_MODS_DIR="/usr/local/lsws/lsphp84/etc/php/8.4/mods-available"
 mkdir -p /tmp/opcache_file_cache
 chown -R nobody:nogroup /tmp/opcache_file_cache
 
-# Apply PHP configurations from safe mounted directory
-[ -f "/tmp/php/uploads.ini" ] && cp -p /tmp/php/uploads.ini "$PHP_MODS_DIR/99-uploads-dynamic.ini" 2>/dev/null || true
+# Generate PHP limits configuration from ENV variables
+echo "Generating dynamic PHP and Opcache configurations..."
+cat <<EOF > "$PHP_MODS_DIR/99-uploads-dynamic.ini"
+upload_max_filesize = ${WORDPRESS_UPLOAD_LIMIT}
+post_max_size = ${WORDPRESS_UPLOAD_LIMIT}
+memory_limit = ${WORDPRESS_MEMORY_LIMIT}
+max_execution_time = ${WORDPRESS_MAX_EXECUTION_TIME}
+max_input_vars = ${WORDPRESS_MAX_INPUT_VARS}
+EOF
 
-# Apply dynamic memory limit if environment variable is set
-if [ -n "$WORDPRESS_MEMORY_LIMIT" ]; then
-    echo "Setting PHP memory limit to $WORDPRESS_MEMORY_LIMIT..."
-    sed -i "s/memory_limit = .*/memory_limit = $WORDPRESS_MEMORY_LIMIT/" "$PHP_MODS_DIR/99-uploads-dynamic.ini"
-fi
-[ -f "/tmp/php/opcache.ini" ] && cp -p /tmp/php/opcache.ini "$PHP_MODS_DIR/99-opcache.ini" 2>/dev/null || true
-[ -f "/tmp/php/mail.ini" ] && cp -p /tmp/php/mail.ini "$PHP_MODS_DIR/99-mail.ini" 2>/dev/null || true
-[ -f "/tmp/php/msmtprc" ] && cp -p /tmp/php/msmtprc /etc/msmtprc 2>/dev/null || true
+# Generate Opcache configuration from ENV variables
+cat <<EOF > "$PHP_MODS_DIR/99-opcache.ini"
+opcache.enable=${OPCACHE_ENABLE}
+opcache.memory_consumption=${OPCACHE_MEMORY_CONSUMPTION}
+opcache.interned_strings_buffer=${OPCACHE_INTERNED_STRINGS_BUFFER}
+opcache.max_accelerated_files=${OPCACHE_MAX_ACCELERATED_FILES}
+opcache.revalidate_freq=${OPCACHE_REVALIDATE_FREQ}
+opcache.fast_shutdown=${OPCACHE_FAST_SHUTDOWN}
 
-# 3. Handle OpenLiteSpeed configuration
-if [ -f "/tmp/ols/vhosts/localhost/vhconf.conf" ]; then
-    mkdir -p /usr/local/lsws/conf/vhosts/localhost/
-    cp /tmp/ols/vhosts/localhost/vhconf.conf /usr/local/lsws/conf/vhosts/localhost/vhconf.conf
-    
-    echo "--- Final OpenLiteSpeed VHost Config ---"
-    cat /usr/local/lsws/conf/vhosts/localhost/vhconf.conf
-    echo "----------------------------------------"
-fi
+; --- Stabilization: Commented out to prevent 503 Crashes ---
+; opcache.jit=tracing
+; opcache.jit_buffer_size=128M
+; opcache.file_cache=/tmp/opcache_file_cache
+EOF
 
-if [ -f "/tmp/ols/templates/docker.conf" ]; then
-    mkdir -p /usr/local/lsws/conf/templates/
-    cp /tmp/ols/templates/docker.conf /usr/local/lsws/conf/templates/docker.conf
-fi
+# Generate Mail configuration for native PHP mail()
+echo "Generating mail configuration for msmtp..."
+cat <<EOF > "$PHP_MODS_DIR/99-mail.ini"
+; Configure PHP to use msmtp for the native mail() function
+sendmail_path = "/usr/bin/msmtp -t"
+EOF
 
+# Generate msmtprc configuration
+cat <<EOF > /etc/msmtprc
+# msmtp configuration for routing native PHP mail() through the relay sidecar
+defaults
+auth           off
+tls            off
+logfile        /tmp/msmtp.log
+account        default
+host           mail-relay
+port           25
+from           wordpress@localhost
+EOF
+
+# 3. Dynamic OpenLiteSpeed configuration
+mkdir -p /usr/local/lsws/conf/templates/
+mkdir -p /usr/local/lsws/conf/vhosts/localhost/
+
+echo "Generating OpenLiteSpeed VHost configuration..."
+cat <<'EOF' > /usr/local/lsws/conf/vhosts/localhost/vhconf.conf
+docRoot                   /var/www/html
+index  {
+  useServer               0
+  indexFiles              index.php, index.html
+}
+
+# 1. Real IP Detection (Trust Dokploy/Proxy Headers)
+accessControl  {
+  allow                   *
+}
+
+# 2. Per-Client Throttling (High-Performance Fail2Ban)
+# Blocks IPs that spam requests (Brute force protection)
+perClientConnLimit  {
+  staticReqLimit          100
+  dynamicReqLimit         5
+  outBandwidth            0
+  inBandwidth             0
+  softLimit               1000
+  hardLimit               1500
+  gracePeriod             15
+  banPeriod               300
+}
+
+scripthttpConfig  {
+  libPath                 modules/lsapi.so
+  maxConn                 100
+  env                     LSAPI_MAX_REQS=500
+  env                     LSAPI_MAX_IDLE=60
+}
+
+rewrite  {
+  enable                  1
+  autoLoadHtaccess        1
+  rules                   <<<END_rules
+# WordPress Basic Rewrites
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+  END_rules
+}
+EOF
+
+echo "Generating OpenLiteSpeed Template configuration..."
+cat <<'EOF' > /usr/local/lsws/conf/templates/docker.conf
+allowSymbolLink           1
+enableScript              1
+restrained                0
+setUIDMode                2
+vhRoot                    /var/www/html/
+configFile                $SERVER_ROOT/conf/vhosts/$VH_NAME/vhconf.conf
+
+virtualHostConfig  {
+  docRoot                 /var/www/html/
+  enableGzip              1
+
+  errorlog  {
+    useServer             1
+  }
+
+  accesslog $SERVER_ROOT/logs/$VH_NAME.access.log {
+    useServer             0
+    rollingSize           10M
+    keepDays              7
+    compressArchive       1
+  }
+
+  index  {
+    useServer             0
+    indexFiles            index.html, index.php
+    autoIndex             0
+    autoIndexURI          /_autoindex/default.php
+  }
+
+  expires  {
+    enableExpires         1
+  }
+
+  accessControl  {
+    allow                 *
+  }
+
+  context / {
+    location              $DOC_ROOT/
+    allowBrowse           1
+
+    rewrite  {
+RewriteFile .htaccess
+    }
+  }
+
+  rewrite  {
+    enable                1
+    autoLoadHtaccess      1    
+    logLevel              0
+  }
+
+  vhssl  {
+    keyFile               /root/.acme.sh/certs/$VH_NAME_ecc/$VH_NAME.key
+    certFile              /root/.acme.sh/certs/$VH_NAME_ecc/fullchain.cer
+    certChain             1
+  }
+}
+EOF
 
 # 5. Configure WordPress (wp-config.php)
 WP_CONFIG="/var/www/html/wp-config.php"

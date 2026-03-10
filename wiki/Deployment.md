@@ -50,6 +50,13 @@ To test the stack on your local machine before deploying:
 | `WORDPRESS_DB_USER` | Database username | `wordpress` |
 | `WORDPRESS_DB_PASSWORD` | Database password | (Required) |
 | `WORDPRESS_MEMORY_LIMIT`| PHP Memory Limit | `256M` |
+| `WORDPRESS_UPLOAD_LIMIT`| Max upload size | `64M` |
+| `WORDPRESS_MAX_EXECUTION_TIME`| PHP script timeout | `300` |
+| `WORDPRESS_MAX_INPUT_VARS`| Max post variables | `3000` |
+| `OPCACHE_ENABLE`| Enable Opcache | `1` |
+| `OPCACHE_MEMORY_CONSUMPTION`| Opcache RAM usage | `256` |
+| `OPCACHE_MAX_ACCELERATED_FILES`| Max cached files | `15000` |
+| `OPCACHE_REVALIDATE_FREQ`| Cache TTL in seconds | `300` |
 
 ## 📁 Managing Volumes
 The system uses named volumes to ensure your data persists across redeployments:

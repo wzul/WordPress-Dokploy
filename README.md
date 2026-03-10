@@ -7,35 +7,44 @@ This repository contains a WordPress setup optimized for deployment via [Dokploy
 
 ## Project Structure
 
-- `Dockerfile`: Custom image that installs `msmtp` for global PHP `mail()` support.
-- `docker-compose.yml`: Orchestrates WordPress, OpenLiteSpeed, and the Mail Relay.
-- `php/`: Configuration for PHP, Opcache, FPM, and SMTP.
-  - `mail.ini` & `msmtprc`: Configures native PHP `mail()` to use the relay.
-- `ols/`: OpenLiteSpeed configuration.
-  - `vhconf.conf`: Virtual Host config that proxies PHP requests to the WordPress sidecar.
+- `Dockerfile`: Custom image that installs `msmtp` and `wp-cli`, and runs the custom initialization script.
+- `docker-compose.yml`: Local testing composition.
+- `php/docker-entrypoint-extra.sh`: The brains of the operation! Dynamically configures OpenLiteSpeed, PHP limits, Opcache, and Mail routing entirely from your Environment Variables on startup.
 
-## Deployment Instructions
+## 🚀 One-Click Deployment (Recommended)
 
-1.  **Preparation**: Ensure your repository is pushed to a Git provider (GitHub, GitLab, etc.).
-2.  **In Dokploy**:
-    - Create a new **Compose** project.
-    - Connect your Git repository.
-    - Dokploy will automatically detect the `docker-compose.yml` file and use the `Dockerfile` to build your specialized WordPress image.
-3.  **Environment Variables**:
-    - Define the following in the Dokploy **"Environment"** tab for your project:
-      - `WORDPRESS_DB_HOST`: Database hostname (defaults to `wp_db`).
-      - `WORDPRESS_DB_NAME`: Database name (defaults to `wordpress`).
-      - `WORDPRESS_DB_USER`: Database user (defaults to `wordpress`).
-      - `WORDPRESS_DB_PASSWORD`: Your database password.
-      - `WORDPRESS_MEMORY_LIMIT`: PHP memory limit (defaults to `256M`).
-      - `OLS_PASSWORD`: Admin password for OpenLiteSpeed (defaults to `admin123`).
-      - `SMTP_SERVER`: Your SMTP provider (e.g., `smtp.mailgun.org`).
-      - `SMTP_PORT`: SMTP port (defaults to `587`).
-      - `SMTP_USERNAME`, `SMTP_PASSWORD`: Your SMTP credentials.
-      - `SERVER_HOSTNAME`: Your site domain (e.g., `example.com`).
-      - `SES_TENANT_TAG`: AWS SES tenant tag for tracking (e.g., `my-tenant`).
-4.  **Deploy**: Click **Deploy** to start all services.
+You can deploy this entire highly-optimized stack in seconds without manually cloning or building any images! 
 
+1. **In Dokploy**: Navigate to your Project and select **Add Service > Compose**.
+2. **Setup**: Select the **"Raw"** input type instead of Git.
+3. **Paste**: Copy and paste the following block into the Compose text box:
+
+```yaml
+services:
+  wordpress:
+    image: ghcr.io/wanzulkarnain/wordpress-dokploy:latest
+    volumes:
+      - wp_app:/var/www/html
+    init: true
+    env_file: ".env"
+    restart: unless-stopped
+
+  mail-relay:
+    image: ghcr.io/wanzulkarnain/wordpress-dokploy-mail-relay:latest
+    env_file: ".env"
+    restart: unless-stopped
+
+  valkey:
+    image: valkey/valkey:latest
+    command: valkey-server --protected-mode no
+    restart: unless-stopped
+
+volumes:
+  wp_app:
+```
+
+4. **Environment Variables**: Go to the service's **Environment** tab. Add your settings (e.g., `WORDPRESS_DB_PASSWORD`, `SMTP_PASSWORD`). Review the `.env.example` file in this repository for a list of all tunable settings!
+5. **Deploy**: Click **Deploy**! Dokploy will instantly pull the pre-compiled images and launch your site.
 ---
 
 ## SMTP & Native mail() Support
@@ -85,12 +94,12 @@ You can access the OLS WebAdmin console on port **7080**.
 
 ---
 
-## Modifying Configuration in Dokploy
+## 🌍 Environment-Driven Configuration (12-Factor App)
 
-Since Dokploy allows you to modify any file, you can adjust your configuration directly from the dashboard.
+This stack eliminates messy file mounts and hardcoded templates. **Everything** is configured via simple Environment Variables inside Dokploy's "Environment" tab:
 
-### Using Dokploy "Files" Feature
-1.  Navigate to your **WordPress Service** (or OLS) in Dokploy.
-2.  Go to the **Files** tab.
-3.  Edit the desired file (e.g., `/usr/local/etc/php/conf.d/uploads.ini`).
-4.  **Save and Redeploy**: Dokploy updates the file and restarts the service.
+- **PHP Tuning**: `WORDPRESS_UPLOAD_LIMIT=128M`, `WORDPRESS_MEMORY_LIMIT=512M`
+- **Opcache**: `OPCACHE_REVALIDATE_FREQ=300`
+- **Security**: `OLS_PASSWORD=MySecureAdminPass`
+
+Simply add the key to Dokploy, and upon clicking deploy, the entrypoint script rebuilds your server architecture perfectly! No more SSHing to touch `php.ini`.
