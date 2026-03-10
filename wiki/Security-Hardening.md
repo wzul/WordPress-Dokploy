@@ -2,16 +2,6 @@
 
 Protecting your server and your WordPress site is a top priority. This stack includes several built-in security features.
 
-## 🛡️ File Manager Protection
-
-To prevent brute-force attacks on your file manager, we use a **Secret URL Path** strategy.
-
-### 1. Secret Path
-Instead of the default `/file-manager/`, you can set a secret path that only you know.
-- **Variable**: `FILE_MANAGER_PATH` in Dokploy.
-- **Example**: `/manage-wp-hidden-789/`
-- **Result**: Bots trying to find a login page at `/file-manager/` will get a `404 Not Found`.
-
 ## 🔒 OpenLiteSpeed Admin Protection
 The OLS Admin panel (port `7080`) is not exposed to the internet by default in our `docker-compose.yml`.
 - **Recommendation**: Map it to a hidden subdomain (e.g., `ols-admin.yourdomain.com`) inside the Dokploy Domains tab.

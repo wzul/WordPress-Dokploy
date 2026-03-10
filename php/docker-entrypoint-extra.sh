@@ -80,6 +80,12 @@ chown -R nobody:nogroup /tmp/opcache_file_cache
 
 # Apply PHP configurations from safe mounted directory
 [ -f "/tmp/php/uploads.ini" ] && cp -p /tmp/php/uploads.ini "$PHP_MODS_DIR/99-uploads-dynamic.ini" 2>/dev/null || true
+
+# Apply dynamic memory limit if environment variable is set
+if [ -n "$WORDPRESS_MEMORY_LIMIT" ]; then
+    echo "Setting PHP memory limit to $WORDPRESS_MEMORY_LIMIT..."
+    sed -i "s/memory_limit = .*/memory_limit = $WORDPRESS_MEMORY_LIMIT/" "$PHP_MODS_DIR/99-uploads-dynamic.ini"
+fi
 [ -f "/tmp/php/opcache.ini" ] && cp -p /tmp/php/opcache.ini "$PHP_MODS_DIR/99-opcache.ini" 2>/dev/null || true
 [ -f "/tmp/php/mail.ini" ] && cp -p /tmp/php/mail.ini "$PHP_MODS_DIR/99-mail.ini" 2>/dev/null || true
 [ -f "/tmp/php/msmtprc" ] && cp -p /tmp/php/msmtprc /etc/msmtprc 2>/dev/null || true
@@ -102,6 +108,21 @@ fi
 
 # 5. Configure WordPress (wp-config.php)
 WP_CONFIG="/var/www/html/wp-config.php"
+
+# Generate wp-config.php from sample if it does not exist
+if [ ! -f "$WP_CONFIG" ] && [ -f "/var/www/html/wp-config-sample.php" ]; then
+    echo "wp-config.php not found. Creating from wp-config-sample.php..."
+    cp /var/www/html/wp-config-sample.php "$WP_CONFIG"
+    
+    # Fetch unique security salts from WordPress.org API
+    echo "Fetching fresh security salts..."
+    SALTS=$(curl -s "https://api.wordpress.org/secret-key/1.1/salt/")
+    if [ -n "$SALTS" ]; then
+        # Remove the dummy salts and append the real ones
+        awk -v salts="$SALTS" '/AUTH_KEY/{if (!done) {print salts; done=1}; next} /SECURE_AUTH_KEY|LOGGED_IN_KEY|NONCE_KEY|AUTH_SALT|SECURE_AUTH_SALT|LOGGED_IN_SALT|NONCE_SALT/{next} {print}' "$WP_CONFIG" > "${WP_CONFIG}.tmp" && mv "${WP_CONFIG}.tmp" "$WP_CONFIG"
+    fi
+fi
+
 if [ -f "$WP_CONFIG" ]; then
     if [ "$DISABLE_WP_CRON" = "true" ]; then
         if ! grep -q "DISABLE_WP_CRON" "$WP_CONFIG"; then
@@ -109,10 +130,16 @@ if [ -f "$WP_CONFIG" ]; then
             # Insert before the "stop editing" line
             sed -i "/\* That's all, stop editing!/i define('DISABLE_WP_CRON', true);" "$WP_CONFIG"
         fi
-    else
-        # If explicitly set to false, ensure it's removed or set to false
-        sed -i "/define('DISABLE_WP_CRON', true);/d" "$WP_CONFIG"
     fi
+fi
+
+# 6. Synchronize Database credentials (Auto-update wp-config.php)
+if [ -f "$WP_CONFIG" ]; then
+    echo "Synchronizing database credentials in wp-config.php..."
+    [ -n "$WORDPRESS_DB_HOST" ] && sed -i "s/define( 'DB_HOST', .*/define( 'DB_HOST', '$WORDPRESS_DB_HOST' );/" "$WP_CONFIG"
+    [ -n "$WORDPRESS_DB_NAME" ] && sed -i "s/define( 'DB_NAME', .*/define( 'DB_NAME', '$WORDPRESS_DB_NAME' );/" "$WP_CONFIG"
+    [ -n "$WORDPRESS_DB_USER" ] && sed -i "s/define( 'DB_USER', .*/define( 'DB_USER', '$WORDPRESS_DB_USER' );/" "$WP_CONFIG"
+    [ -n "$WORDPRESS_DB_PASSWORD" ] && sed -i "s/define( 'DB_PASSWORD', .*/define( 'DB_PASSWORD', '$WORDPRESS_DB_PASSWORD' );/" "$WP_CONFIG"
 fi
 
 # Ensure everything is owned by nobody:nogroup

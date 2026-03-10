@@ -48,6 +48,11 @@ To test the stack on your local machine before deploying:
 | `OVERWRITE_FROM`| Soft Email Overwrite (Required) | `(None)` |
 | `SERVER_HOSTNAME` | Your site domain (for Postfix EHLO) | `localhost` |
 | `SES_TENANT_TAG` | AWS SES Tenant ID for tagging | `default` |
+| `WORDPRESS_DB_HOST` | Database host (e.g. mysql:3306) | `wp_db` |
+| `WORDPRESS_DB_NAME` | Database name | `wordpress` |
+| `WORDPRESS_DB_USER` | Database username | `wordpress` |
+| `WORDPRESS_DB_PASSWORD` | Database password | (Required) |
+| `WORDPRESS_MEMORY_LIMIT`| PHP Memory Limit | `256M` |
 
 ## 📁 Managing Volumes
 The system uses named volumes to ensure your data persists across redeployments:
