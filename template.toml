@@ -1,0 +1,51 @@
+[variables]
+main_domain = "${domain}"
+ols_password = "${password:16}"
+db_password = "${password:32}"
+
+[config]
+env = [
+  # Database Configuration
+  "WORDPRESS_DB_HOST=mysql:3306",
+  "WORDPRESS_DB_NAME=wordpress",
+  "WORDPRESS_DB_USER=wordpress",
+  "WORDPRESS_DB_PASSWORD=${db_password}",
+  
+  # Security
+  "OLS_PASSWORD=${ols_password}",
+
+  # PHP Limits
+  "WORDPRESS_MEMORY_LIMIT=256M",
+  "WORDPRESS_UPLOAD_LIMIT=64M",
+  "WORDPRESS_MAX_EXECUTION_TIME=300",
+  "WORDPRESS_MAX_INPUT_VARS=3000",
+  
+  # Opcache Defaults (Production Optimized)
+  "OPCACHE_ENABLE=1",
+  "OPCACHE_MEMORY_CONSUMPTION=256",
+  "OPCACHE_INTERNED_STRINGS_BUFFER=8",
+  "OPCACHE_MAX_ACCELERATED_FILES=15000",
+  "OPCACHE_REVALIDATE_FREQ=300",
+  "OPCACHE_FAST_SHUTDOWN=1",
+  
+  # Mail configuration template
+  "SMTP_SERVER=email-smtp.ap-southeast-1.amazonaws.com",
+  "SMTP_PORT=587",
+  "SMTP_USERNAME=AKIAXXXXXXXX",
+  "SMTP_PASSWORD=pass",
+  "SERVER_HOSTNAME=${main_domain}",
+  "OVERWRITE_FROM=site-admin@example.com",
+  "SES_TENANT_TAG=your-tenant-name",
+  "DISABLE_WP_CRON=true"
+]
+
+[[config.domains]]
+serviceName = "wordpress"
+port = 80
+host = "${main_domain}"
+
+# OLS WebAdmin Panel Domain
+[[config.domains]]
+serviceName = "wordpress"
+port = 7080
+host = "ols.${main_domain}"
