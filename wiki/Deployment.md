@@ -20,9 +20,9 @@ This setup is designed specifically for **Dokploy** using the "Compose" service 
 5. **Environment Configuration (CRITICAL)**:
    > [!IMPORTANT]
    > Dokploy current cannot successfully inject host-level environment variables for the "Compose" service type. To manage your secrets:
-   - Go to the **Files** tab of your service.
-   - Create a new file manually named exactly **`env`** (without the dot).
-   - Paste your configuration variables (e.g., `OLS_PASSWORD=...`) into this file.
+   - Go to the **Patches** tab of your service.
+   - Click "Add Patch" or create a new entry manually named exactly **`env`** (without the dot).
+   - Paste your configuration variables (e.g., `OLS_PASSWORD=...`) into this file/patch.
    - The `docker-compose.dokploy.yml` is configured to read from this file natively.
 6. **Domain Mapping**:
    - Go to the **Domains** tab.
