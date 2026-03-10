@@ -32,7 +32,7 @@ fi
 
 # Create the MU loader for LiteSpeed Cache
 echo "Creating LiteSpeed Cache MU loader..."
-cat <<EOF > "$MU_PLUGINS/lscache-mu.php"
+cat <<'EOF' > "$MU_PLUGINS/lscache-mu.php"
 <?php
 /*
 Plugin Name: LiteSpeed Cache (MU)
