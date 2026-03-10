@@ -9,7 +9,7 @@ This setup is designed specifically for **Dokploy** using the "Compose" service 
 ## 2. Deployment Steps
 
 ### In your Git Provider:
-1. Ensure your `env` is NOT committed (use `env.example` as a template).
+1. Ensure your `.env` is NOT committed (use `.env.example` as a template).
 
 ### In Dokploy:
 1. Create a new **Project**.
@@ -17,13 +17,10 @@ This setup is designed specifically for **Dokploy** using the "Compose" service 
 3. Point to your Git repository URL.
 4. **General Configuration**:
    - Set **Compose Path** to `docker-compose.dokploy.yml`.
-5. **Environment Configuration (CRITICAL)**:
-   > [!IMPORTANT]
-   > Dokploy current cannot successfully inject host-level environment variables for the "Compose" service type. To manage your secrets:
-   - Go to the **Patches** tab of your service.
-   - Click "Add Patch" or create a new entry manually named exactly **`env`** (without the dot).
-   - Paste your configuration variables (e.g., `OLS_PASSWORD=...`) into this file/patch.
-   - The `docker-compose.dokploy.yml` is configured to read from this file natively.
+5. **Environment Configuration**:
+   - Go to the **Environment** tab of your service.
+   - Add your configuration variables as simple Key/Value pairs (e.g., Key: `OLS_PASSWORD`, Value: `admin123`).
+   - Dokploy automatically generates a `.env` file from these pairs, and our `docker-compose.dokploy.yml` consumes it automatically!
 6. **Domain Mapping**:
    - Go to the **Domains** tab.
    - **Main Site**: Add your domain (e.g., `mysite.com`) and point it to service **`wordpress`** on port **80**.
@@ -32,7 +29,7 @@ This setup is designed specifically for **Dokploy** using the "Compose" service 
 
 ## 💻 Local Testing
 To test the stack on your local machine before deploying:
-1. Copy `env.patch` provided in this repo.
+1. Copy `.env.example` to `.env` in this directory.
 2. Run `docker-compose up -d`.
 3. Open `http://localhost:8080` for the WordPress site.
 4. Open `https://localhost:7080` for the OpenLiteSpeed Admin console.
