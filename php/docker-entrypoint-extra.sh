@@ -76,6 +76,7 @@ if (defined('WP_PLUGIN_DIR') && file_exists(WP_PLUGIN_DIR . '/litespeed-cache/li
     require_once WP_PLUGIN_DIR . '/litespeed-cache/litespeed-cache.php';
 }
 EOF
+    chown -R nobody:nogroup "$WP_CONTENT"
 fi
 
 # 2. Inject environment variables for LiteSpeed PHP settings into LSAPI
@@ -304,6 +305,9 @@ if [ "$INSTALL_WORDPRESS" = "true" ]; then
         [ -n "$WORDPRESS_DB_USER" ] && sed -i "s/define( 'DB_USER', .*/define( 'DB_USER', '$WORDPRESS_DB_USER' );/" "$WP_CONFIG"
         [ -n "$WORDPRESS_DB_PASSWORD" ] && sed -i "s/define( 'DB_PASSWORD', .*/define( 'DB_PASSWORD', '$WORDPRESS_DB_PASSWORD' );/" "$WP_CONFIG"
     fi
+
+    # Set ownership for created/modified WordPress files
+    chown nobody:nogroup "$WP_CONFIG" 2>/dev/null || true
 fi
 
 # Ensure everything is owned by nobody:nogroup
