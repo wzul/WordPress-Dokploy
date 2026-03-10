@@ -3,32 +3,38 @@ set -e
 
 echo "Starting LiteSpeed + WordPress Initialization..."
 
+# 0. Check if WordPress installation should be skipped
+INSTALL_WORDPRESS=${INSTALL_WORDPRESS:-true}
+
 # 1. Download WordPress core if it doesn't exist
-if [ ! -d "/var/www/html/wp-includes" ]; then
-    echo "WordPress core not found. Downloading..."
-    curl -o /tmp/wordpress.tar.gz -fSL "https://wordpress.org/latest.tar.gz"
-    tar -xzf /tmp/wordpress.tar.gz -C /tmp/
-    cp -rp /tmp/wordpress/* /var/www/html/
-    chown -R nobody:nogroup /var/www/html
-    rm -rf /tmp/wordpress /tmp/wordpress.tar.gz
+if [ "$INSTALL_WORDPRESS" = "true" ]; then
+    if [ ! -d "/var/www/html/wp-includes" ]; then
+        echo "WordPress core not found. Downloading..."
+        curl -o /tmp/wordpress.tar.gz -fSL "https://wordpress.org/latest.tar.gz"
+        tar -xzf /tmp/wordpress.tar.gz -C /tmp/
+        cp -rp /tmp/wordpress/* /var/www/html/
+        chown -R nobody:nogroup /var/www/html
+        rm -rf /tmp/wordpress /tmp/wordpress.tar.gz
+    fi
 fi
 
 # 4. Install LiteSpeed Cache as a Must-Use plugin
-WP_CONTENT="/var/www/html/wp-content"
+if [ "$INSTALL_WORDPRESS" = "true" ]; then
+    WP_CONTENT="/var/www/html/wp-content"
 MU_PLUGINS="$WP_CONTENT/mu-plugins"
 LSC_DIR="$WP_CONTENT/plugins/litespeed-cache"
 
-if [ ! -d "$LSC_DIR" ]; then
-    echo "LiteSpeed Cache plugin not found. Installing..."
-    mkdir -p "$WP_CONTENT/plugins"
-    curl -o /tmp/lscache.zip -fSL "https://downloads.wordpress.org/plugin/litespeed-cache.latest-stable.zip"
-    unzip -q /tmp/lscache.zip -d "$WP_CONTENT/plugins/"
-    rm /tmp/lscache.zip
-fi
+    if [ ! -d "$LSC_DIR" ]; then
+        echo "LiteSpeed Cache plugin not found. Installing..."
+        mkdir -p "$WP_CONTENT/plugins"
+        curl -o /tmp/lscache.zip -fSL "https://downloads.wordpress.org/plugin/litespeed-cache.latest-stable.zip"
+        unzip -q /tmp/lscache.zip -d "$WP_CONTENT/plugins/"
+        rm /tmp/lscache.zip
+    fi
 
-if [ ! -d "$MU_PLUGINS" ]; then
-    mkdir -p "$MU_PLUGINS"
-fi
+    if [ ! -d "$MU_PLUGINS" ]; then
+        mkdir -p "$MU_PLUGINS"
+    fi
 
 # Create the MU loader for LiteSpeed Cache
 echo "Creating LiteSpeed Cache MU loader..."
@@ -70,6 +76,7 @@ if (defined('WP_PLUGIN_DIR') && file_exists(WP_PLUGIN_DIR . '/litespeed-cache/li
     require_once WP_PLUGIN_DIR . '/litespeed-cache/litespeed-cache.php';
 }
 EOF
+fi
 
 # 2. Inject environment variables for LiteSpeed PHP settings into LSAPI
 PHP_MODS_DIR="/usr/local/lsws/lsphp84/etc/php/8.4/mods-available"
@@ -159,12 +166,14 @@ scripthttpConfig  {
   env                     LSAPI_MAX_REQS=500
   env                     LSAPI_MAX_IDLE=60
 }
-
+EOF
+# 4. URL Rewriting (Front Controller pattern for WP/Laravel/etc)
+cat <<EOF >> /usr/local/lsws/conf/vhosts/localhost/vhconf.conf
 rewrite  {
   enable                  1
   autoLoadHtaccess        1
   rules                   <<<END_rules
-# WordPress Basic Rewrites
+# Basic Front Controller Rewrites
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . /index.php [L]
@@ -260,39 +269,41 @@ sed -i "/enableGzip/d" /usr/local/lsws/conf/templates/docker.conf
 sed -i "/docRoot/a \  enableGzip              ${GZIP_ENABLE:-1}\n  enableBrotli            ${BROTLI_ENABLE:-1}" /usr/local/lsws/conf/templates/docker.conf
 
 # 5. Configure WordPress (wp-config.php)
-WP_CONFIG="/var/www/html/wp-config.php"
+if [ "$INSTALL_WORDPRESS" = "true" ]; then
+    WP_CONFIG="/var/www/html/wp-config.php"
 
-# Generate wp-config.php from sample if it does not exist
-if [ ! -f "$WP_CONFIG" ] && [ -f "/var/www/html/wp-config-sample.php" ]; then
-    echo "wp-config.php not found. Creating from wp-config-sample.php..."
-    cp /var/www/html/wp-config-sample.php "$WP_CONFIG"
-    
-    # Fetch unique security salts from WordPress.org API
-    echo "Fetching fresh security salts..."
-    SALTS=$(curl -s "https://api.wordpress.org/secret-key/1.1/salt/")
-    if [ -n "$SALTS" ]; then
-        # Remove the dummy salts and append the real ones
-        awk -v salts="$SALTS" '/AUTH_KEY/{if (!done) {print salts; done=1}; next} /SECURE_AUTH_KEY|LOGGED_IN_KEY|NONCE_KEY|AUTH_SALT|SECURE_AUTH_SALT|LOGGED_IN_SALT|NONCE_SALT/{next} {print}' "$WP_CONFIG" > "${WP_CONFIG}.tmp" && mv "${WP_CONFIG}.tmp" "$WP_CONFIG"
-    fi
-fi
-
-if [ -f "$WP_CONFIG" ]; then
-    if [ "$DISABLE_WP_CRON" = "true" ]; then
-        if ! grep -q "DISABLE_WP_CRON" "$WP_CONFIG"; then
-            echo "Disabling internal WordPress cron in wp-config.php..."
-            # Insert before the "stop editing" line
-            sed -i "/\* That's all, stop editing!/i define('DISABLE_WP_CRON', true);" "$WP_CONFIG"
+    # Generate wp-config.php from sample if it does not exist
+    if [ ! -f "$WP_CONFIG" ] && [ -f "/var/www/html/wp-config-sample.php" ]; then
+        echo "wp-config.php not found. Creating from wp-config-sample.php..."
+        cp /var/www/html/wp-config-sample.php "$WP_CONFIG"
+        
+        # Fetch unique security salts from WordPress.org API
+        echo "Fetching fresh security salts..."
+        SALTS=$(curl -s "https://api.wordpress.org/secret-key/1.1/salt/")
+        if [ -n "$SALTS" ]; then
+            # Remove the dummy salts and append the real ones
+            awk -v salts="$SALTS" '/AUTH_KEY/{if (!done) {print salts; done=1}; next} /SECURE_AUTH_KEY|LOGGED_IN_KEY|NONCE_KEY|AUTH_SALT|SECURE_AUTH_SALT|LOGGED_IN_SALT|NONCE_SALT/{next} {print}' "$WP_CONFIG" > "${WP_CONFIG}.tmp" && mv "${WP_CONFIG}.tmp" "$WP_CONFIG"
         fi
     fi
-fi
 
-# 6. Synchronize Database credentials (Auto-update wp-config.php)
-if [ -f "$WP_CONFIG" ]; then
-    echo "Synchronizing database credentials in wp-config.php..."
-    [ -n "$WORDPRESS_DB_HOST" ] && sed -i "s/define( 'DB_HOST', .*/define( 'DB_HOST', '$WORDPRESS_DB_HOST' );/" "$WP_CONFIG"
-    [ -n "$WORDPRESS_DB_NAME" ] && sed -i "s/define( 'DB_NAME', .*/define( 'DB_NAME', '$WORDPRESS_DB_NAME' );/" "$WP_CONFIG"
-    [ -n "$WORDPRESS_DB_USER" ] && sed -i "s/define( 'DB_USER', .*/define( 'DB_USER', '$WORDPRESS_DB_USER' );/" "$WP_CONFIG"
-    [ -n "$WORDPRESS_DB_PASSWORD" ] && sed -i "s/define( 'DB_PASSWORD', .*/define( 'DB_PASSWORD', '$WORDPRESS_DB_PASSWORD' );/" "$WP_CONFIG"
+    if [ -f "$WP_CONFIG" ]; then
+        if [ "$DISABLE_WP_CRON" = "true" ]; then
+            if ! grep -q "DISABLE_WP_CRON" "$WP_CONFIG"; then
+                echo "Disabling internal WordPress cron in wp-config.php..."
+                # Insert before the "stop editing" line
+                sed -i "/\* That's all, stop editing!/i define('DISABLE_WP_CRON', true);" "$WP_CONFIG"
+            fi
+        fi
+    fi
+
+    # 6. Synchronize Database credentials (Auto-update wp-config.php)
+    if [ -f "$WP_CONFIG" ]; then
+        echo "Synchronizing database credentials in wp-config.php..."
+        [ -n "$WORDPRESS_DB_HOST" ] && sed -i "s/define( 'DB_HOST', .*/define( 'DB_HOST', '$WORDPRESS_DB_HOST' );/" "$WP_CONFIG"
+        [ -n "$WORDPRESS_DB_NAME" ] && sed -i "s/define( 'DB_NAME', .*/define( 'DB_NAME', '$WORDPRESS_DB_NAME' );/" "$WP_CONFIG"
+        [ -n "$WORDPRESS_DB_USER" ] && sed -i "s/define( 'DB_USER', .*/define( 'DB_USER', '$WORDPRESS_DB_USER' );/" "$WP_CONFIG"
+        [ -n "$WORDPRESS_DB_PASSWORD" ] && sed -i "s/define( 'DB_PASSWORD', .*/define( 'DB_PASSWORD', '$WORDPRESS_DB_PASSWORD' );/" "$WP_CONFIG"
+    fi
 fi
 
 # Ensure everything is owned by nobody:nogroup

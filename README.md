@@ -123,6 +123,26 @@ You can access the OLS WebAdmin console on port **7080**.
 - **Password**: The `OLS_PASSWORD` you set in Dokploy.
 
 ---
+---
+
+## 🏗️ Usage as a General PHP Image
+
+While this image is optimized for WordPress, it can be used for any PHP application by disabling the WordPress-specific initialization steps.
+
+Set the following environment variable to `false`:
+- `INSTALL_WORDPRESS=false`
+
+This will:
+- Skip downloading WordPress core.
+- Skip installing LiteSpeed Cache (MU) plugins.
+- Skip generating or modifying `wp-config.php`.
+
+The basic front controller rewrite rules (directing non-existent files/dirs to `index.php`) remain active to support modern PHP frameworks like Laravel or custom apps.
+
+You can then mount your own PHP application code to `/var/www/html`.
+
+---
+---
 
 ## 🌍 Environment-Driven Configuration (12-Factor App)
 
