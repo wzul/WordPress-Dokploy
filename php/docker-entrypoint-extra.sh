@@ -119,7 +119,7 @@ if [ -f "$HTTPD_CONF" ]; then
     
     # Append to the accessControl allow list in the global config
     # This prevents header spoofing by untrusted sources
-    sed -i "s/allow[[:space:]]*ALL/allow $TRUSTED_IPS/" "$HTTPD_CONF"
+    sed -i "s|allow[[:space:]]*ALL|allow $TRUSTED_IPS|" "$HTTPD_CONF"
 fi
 
 # 5. Configure WordPress (wp-config.php)
