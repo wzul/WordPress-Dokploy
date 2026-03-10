@@ -36,7 +36,11 @@ env = [
   "SERVER_HOSTNAME=${main_domain}",
   "OVERWRITE_FROM=site-admin@example.com",
   "SES_TENANT_TAG=your-tenant-name",
-  "DISABLE_WP_CRON=true"
+  "DISABLE_WP_CRON=true",
+  
+  # Performance - Compression
+  "GZIP_ENABLE=1",
+  "BROTLI_ENABLE=1"
 ]
 
 [[config.domains]]

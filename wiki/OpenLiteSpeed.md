@@ -31,5 +31,13 @@ In this **unified setup**, OpenLiteSpeed and PHP are in the same container.
 - **Static Files**: OLS serves CSS, JS, and images directly from `/var/www/html/`.
 - **PHP Handling**: OLS uses the built-in **LSAPI (Litespeed SAPI)** to process PHP 8.4 files natively. This is significantly more efficient than traditional FastCGI networking.
 
+## ⚡ Performance & Compression
+This stack is pre-configured with industry-standard compression to ensure your pages load at maximum speed.
+
+- **Gzip Compression**: Enabled by default (`GZIP_ENABLE=1`). Compresses static and dynamic content for broad browser compatibility.
+- **Brotli Compression**: Enabled by default (`BROTLI_ENABLE=1`). Provides superior compression ratios compared to Gzip for modern browsers.
+
+These can be toggled via environment variables in Dokploy.
+
 ## 📜 Logs
 OpenLiteSpeed logs are stored within the container at `/usr/local/lsws/logs/`. You can view them directly in the Dokploy dashboard under the **`wordpress`** service logs.

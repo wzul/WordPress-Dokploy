@@ -231,8 +231,33 @@ RewriteFile .htaccess
     certFile              /root/.acme.sh/certs/$VH_NAME_ecc/fullchain.cer
     certChain             1
   }
+
+  module lscache {
+    lsapi_cache_enabled   1
+  }
+}
+
+# 6. Global Compression Settings (Server Level placeholder if needed)
+# OpenLiteSpeed enables compression by default, but we ensure it here at VHost level.
+EOF
+
+# Update vhconf.conf with compression blocks
+cat <<EOF >> /usr/local/lsws/conf/vhosts/localhost/vhconf.conf
+
+# Compression Settings
+gzip  {
+  enable                  ${GZIP_ENABLE:-1}
+  compressibleTypes       default
+}
+
+brotli  {
+  enable                  ${BROTLI_ENABLE:-1}
 }
 EOF
+
+# Update docker.conf template with compression blocks
+sed -i "/enableGzip/d" /usr/local/lsws/conf/templates/docker.conf
+sed -i "/docRoot/a \  enableGzip              ${GZIP_ENABLE:-1}\n  enableBrotli            ${BROTLI_ENABLE:-1}" /usr/local/lsws/conf/templates/docker.conf
 
 # 5. Configure WordPress (wp-config.php)
 WP_CONFIG="/var/www/html/wp-config.php"
