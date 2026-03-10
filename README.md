@@ -108,6 +108,7 @@ OpenLiteSpeed is a high-performance HTTP server that handles massive concurrency
 
 ## Accessing the OLS Admin Panel
 You can access the OLS WebAdmin console on port **7080**.
+
 - **User**: `admin`
 - **Password**: The `OLS_PASSWORD` you set in Dokploy.
 
@@ -122,3 +123,9 @@ This stack eliminates messy file mounts and hardcoded templates. **Everything** 
 - **Security**: `OLS_PASSWORD=MySecureAdminPass`
 
 Simply add the key to Dokploy, and upon clicking deploy, the entrypoint script rebuilds your server architecture perfectly! No more SSHing to touch `php.ini`.
+
+---
+
+## 📜 License
+
+This project is licensed under the **GPL-3.0 License**. See the [LICENSE](LICENSE) file for the full text. This ensures compatibility with the core technologies utilized in this stack, including OpenLiteSpeed, WordPress, and LiteSpeed Cache.
