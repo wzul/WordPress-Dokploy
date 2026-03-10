@@ -1,6 +1,9 @@
 services:
   wordpress:
     build: .
+    ports:
+      - "8080:80"
+      - "7080:7080"
     volumes:
       - wp_app:/var/www/html
     init: true

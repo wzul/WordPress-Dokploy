@@ -7,8 +7,8 @@ This repository contains a WordPress setup optimized for deployment via [Dokploy
 
 ## Project Structure
 
-- `Dockerfile`: Custom image that installs `msmtp` and `wp-cli`, and runs the custom initialization script.
-- `docker-compose.yml`: Local testing composition.
+- `docker-compose.yml`: The primary production/distribution entry point! Optimized to pull pre-built images for instant deployment.
+- `docker-compose.local.yml`: The local development playground! Built-in port 8080/7080 mapping and uses `build: .` to test your local code changes immediately.
 - `php/docker-entrypoint-extra.sh`: The brains of the operation! Dynamically configures OpenLiteSpeed, PHP limits, Opcache, and Mail routing entirely from your Environment Variables on startup.
 
 ## 🚀 One-Click Deployment (Recommended)
