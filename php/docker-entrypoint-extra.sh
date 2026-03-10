@@ -97,16 +97,15 @@ HTTPD_CONF="/usr/local/lsws/conf/httpd_config.conf"
 if [ -f "$HTTPD_CONF" ]; then
     echo "Securing IP detection: Whitelisting Cloudflare & Internal IPs..."
     
-    # 1. Enable header detection (X-Forwarded-For)
-    # We use a more flexible regex to handle different spacing
-    sed -i "s|[[:space:]]*useIpInProxyHeader.*|  useIpInProxyHeader        1|" "$HTTPD_CONF"
+    # 1. Enable header detection (Mode 3 = Native Cloudflare support)
+    # We use a very broad sed to ensure it hits even with weird indentation
+    sed -i "s|.*useIpInProxyHeader.*|  useIpInProxyHeader        3|" "$HTTPD_CONF"
     
-    # Force use of Cloudflare header (CF-Connecting-IP)
-    # Setting to '2' forces OLS to trust the header even if it's the only proxy
-    if ! grep -q "extAppIpFromHeader" "$HTTPD_CONF"; then
-        sed -i "/useIpInProxyHeader/a \  extAppIpFromHeader      2" "$HTTPD_CONF"
+    # extAppIpFromHeader 2 = Forced for PHP/LSAPI
+    if grep -q "extAppIpFromHeader" "$HTTPD_CONF"; then
+        sed -i "s|.*extAppIpFromHeader.*|  extAppIpFromHeader      2|" "$HTTPD_CONF"
     else
-        sed -i "s|[[:space:]]*extAppIpFromHeader.*|  extAppIpFromHeader      2|" "$HTTPD_CONF"
+        sed -i "/useIpInProxyHeader/a \  extAppIpFromHeader      2" "$HTTPD_CONF"
     fi
 
     # 2. Fetch Trusted Cloudflare & Local IPs dynamically
@@ -127,8 +126,8 @@ if [ -f "$HTTPD_CONF" ]; then
     TRUSTED_IPS="127.0.0.1, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, $CF_IPV4, $CF_IPV6"
     
     # Update the Server accessControl allow list
-    # Use a more specific sed to match the 'allow ALL' line
-    sed -i "s|[[:space:]]*allow[[:space:]]*ALL|  allow                   $TRUSTED_IPS|" "$HTTPD_CONF"
+    # Use a broad regex to find 'allow ALL' OR 'allow *'
+    sed -i "s|[[:space:]]*allow.*|  allow                   $TRUSTED_IPS|" "$HTTPD_CONF"
 fi
 
 # 5. Configure WordPress (wp-config.php)
