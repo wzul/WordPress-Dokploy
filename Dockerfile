@@ -10,7 +10,7 @@ RUN apt-get update && \
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
     chmod +x wp-cli.phar && \
     mv wp-cli.phar /usr/local/bin/wp-cli.phar && \
-    echo '#!/bin/bash\nsu -s /bin/bash nobody -c "php /usr/local/bin/wp-cli.phar $*"' > /usr/local/bin/wp && \
+    echo '#!/bin/bash\nphp /usr/local/bin/wp-cli.phar "$@" --allow-root' > /usr/local/bin/wp && \
     chmod +x /usr/local/bin/wp
 
 # Default PHP/WordPress Performance
