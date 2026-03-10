@@ -91,21 +91,6 @@ if [ -f "/tmp/ols/templates/docker.conf" ]; then
     cp /tmp/ols/templates/docker.conf /usr/local/lsws/conf/templates/docker.conf
 fi
 
-# 6. Enable Real IP Detection (Trust Traefik Proxy)
-# Traefik handles Cloudflare and passes the Real IP to OLS via X-Forwarded-For
-HTTPD_CONF="/usr/local/lsws/conf/httpd_config.conf"
-if [ -f "$HTTPD_CONF" ]; then
-    echo "Configuring OLS to trust Traefik proxy headers..."
-    
-    # 1. Enable header detection (Mode 1 = X-Forwarded-For)
-    sed -i "s|.*useIpInProxyHeader.*|  useIpInProxyHeader        1|" "$HTTPD_CONF"
-    
-    # 2. Trust internal Docker networks (where Traefik resides)
-    TRUSTED_IPS="127.0.0.1, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16"
-    
-    # Update the Server accessControl allow list to trust these proxies
-    sed -i "s|[[:space:]]*allow.*|  allow                   $TRUSTED_IPS|" "$HTTPD_CONF"
-fi
 
 # 5. Configure WordPress (wp-config.php)
 WP_CONFIG="/var/www/html/wp-config.php"
