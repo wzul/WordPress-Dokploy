@@ -11,19 +11,10 @@ This repository contains a WordPress setup optimized for deployment via [Dokploy
 - `docker-compose.local.yml`: The local development playground! Built-in port 8080/7080 mapping and uses `build: .` to test your local code changes immediately.
 - `php/docker-entrypoint-extra.sh`: The brains of the operation! Dynamically configures OpenLiteSpeed, PHP limits, Opcache, and Mail routing entirely from your Environment Variables on startup.
 
-## 🚀 One-Click Deployment (Recommended)
+## 🚀 Deployment Instructions
 
-### 1. As a Custom Blueprint (Easiest)
-This is the most professional way to deploy. It automatically provisions your **Managed MariaDB**, maps your **Domains**, and generates **Secure Passwords** for you.
-
-1. In Dokploy, go to **Templates** -> **Create from Template**.
-2. In the **Base URL (optional)** box at the top, paste:
-   `https://github.com/wzul/wordpress-dokploy`
-3. Hit **Enter**. Your **WordPress Dokploy** card will appear! 
-4. Click **Create**, enter your domain, and you're live.
-
-### 2. Manual "Raw YAML" Deployment
-If you just want to copy-paste the configuration into an existing Compose service:
+### 1. Manual "Raw YAML" Deployment (Recommended)
+You can deploy this entire highly-optimized stack in seconds without manually cloning or building any images:
 
 1. **In Dokploy**: Navigate to your Project and select **Add Service > Compose**.
 2. **Setup**: Select the **"Raw"** input type.
