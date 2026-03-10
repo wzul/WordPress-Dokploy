@@ -91,42 +91,19 @@ if [ -f "/tmp/ols/templates/docker.conf" ]; then
     cp /tmp/ols/templates/docker.conf /usr/local/lsws/conf/templates/docker.conf
 fi
 
-# 6. Enable Secure Real IP Detection (Spoof-Proof)
-# This trusts X-Forwarded-For ONLY from Cloudflare and internal Dokploy proxies.
+# 6. Enable Real IP Detection (Trust Traefik Proxy)
+# Traefik handles Cloudflare and passes the Real IP to OLS via X-Forwarded-For
 HTTPD_CONF="/usr/local/lsws/conf/httpd_config.conf"
 if [ -f "$HTTPD_CONF" ]; then
-    echo "Securing IP detection: Whitelisting Cloudflare & Internal IPs..."
+    echo "Configuring OLS to trust Traefik proxy headers..."
     
-    # 1. Enable header detection (Mode 3 = Native Cloudflare support)
-    # We use a very broad sed to ensure it hits even with weird indentation
-    sed -i "s|.*useIpInProxyHeader.*|  useIpInProxyHeader        3|" "$HTTPD_CONF"
+    # 1. Enable header detection (Mode 1 = X-Forwarded-For)
+    sed -i "s|.*useIpInProxyHeader.*|  useIpInProxyHeader        1|" "$HTTPD_CONF"
     
-    # extAppIpFromHeader 2 = Forced for PHP/LSAPI
-    if grep -q "extAppIpFromHeader" "$HTTPD_CONF"; then
-        sed -i "s|.*extAppIpFromHeader.*|  extAppIpFromHeader      2|" "$HTTPD_CONF"
-    else
-        sed -i "/useIpInProxyHeader/a \  extAppIpFromHeader      2" "$HTTPD_CONF"
-    fi
-
-    # 2. Fetch Trusted Cloudflare & Local IPs dynamically
-    echo "Fetching latest Cloudflare IP ranges from official API..."
-    CF_IPS_JSON=$(curl -s --connect-timeout 5 "https://api.cloudflare.com/client/v4/ips")
+    # 2. Trust internal Docker networks (where Traefik resides)
+    TRUSTED_IPS="127.0.0.1, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16"
     
-    if [ "$(echo "$CF_IPS_JSON" | grep -c "\"success\":true")" -gt 0 ]; then
-        echo "Successfully updated Cloudflare IPs from API."
-        CF_IPV4=$(echo "$CF_IPS_JSON" | grep -oE "[0-9]{1,3}(\.[0-9]{1,3}){3}/[0-9]{1,2}" | tr '\n' ',' | sed 's/,$//')
-        CF_IPV6=$(echo "$CF_IPS_JSON" | grep -oE "([0-9a-fA-F]{0,4}:){2,7}[0-9a-fA-F]{0,4}/[0-9]{1,3}" | tr '\n' ',' | sed 's/,$//')
-    else
-        echo "Warning: API request failed. Using hardcoded fallback."
-        CF_IPV4="173.245.48.0/20, 103.21.244.0/22, 103.22.200.0/22, 103.31.4.0/22, 141.101.64.0/18, 108.162.192.0/18, 190.93.240.0/20, 188.114.96.0/20, 197.234.240.0/22, 198.41.128.0/17, 162.158.0.0/15, 104.16.0.0/13, 104.24.0.0/14, 172.64.0.0/13, 131.0.72.0/22"
-        CF_IPV6="2400:cb00::/32, 2606:4700::/32, 2803:f800::/32, 2405:b500::/32, 2405:8100::/32, 2a06:98c0::/29, 2c0f:f248::/32"
-    fi
-
-    # Trust local private networks + Cloudflare
-    TRUSTED_IPS="127.0.0.1, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, $CF_IPV4, $CF_IPV6"
-    
-    # Update the Server accessControl allow list
-    # Use a broad regex to find 'allow ALL' OR 'allow *'
+    # Update the Server accessControl allow list to trust these proxies
     sed -i "s|[[:space:]]*allow.*|  allow                   $TRUSTED_IPS|" "$HTTPD_CONF"
 fi
 
