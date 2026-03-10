@@ -5,40 +5,16 @@ For the highest level of security, you can configure your Dokploy server to **on
 > [!IMPORTANT]
 > This setup requires SSH access to your server and modification of the global Traefik configuration in Dokploy.
 
-## 1. Global Traefik Configuration (`traefik.yml`)
+## 1. Dynamic Filter Configuration
 
-Log in to your **Dokploy Dashboard**, navigate to **Settings > Traefik**, and find the **Static Configuration** (`traefik.yml`). Update the `entryPoints` section as follows:
-
-```yaml
-entryPoints:
-  web:
-    address: :80
-  websecure:
-    forwardedHeaders:
-      # Trust all IPs for headers because we will filter at the middleware layer
-      trustedIPs:
-        - "0.0.0.0/0"
-        - "::/0"
-    address: :443
-    http3:
-      advertisedPort: 443
-    http:
-      middlewares:
-        # Apply the Cloudflare filter globally to all HTTPS traffic
-        - only-cloudflare@file
-      tls:
-        certResolver: letsencrypt
-```
-
-### Why these settings?
-*   **trustedIPs**: We set this to broad ranges because we are offloading the IP filtering to a specialized middleware.
-*   **middlewares**: By adding `only-cloudflare@file` to the `websecure` entrypoint, **every** application on your server will automatically benefit from the Cloudflare-only protection.
-
----
-
-## 2. Dynamic Filter Configuration
+> [!TIP]
+> **Use Your Hosting Provider's Firewall First!**
+> This dynamic Traefik filter is only required if you are using a VPS provider that **does not** support blocking access outside of the VPS (e.g., **Contabo**). 
+> 
+> If you are using a provider that has a robust external firewall panel (e.g., **AWS EC2 Security Groups**, **IPServerOne**, DigitalOcean Cloud Firewalls), you should use their panel to block non-Cloudflare IPs instead of setting it up inside Traefik. It is more secure and consumes zero server resources!
 
 Since Dokploy does not allow creating new dynamic configuration files from the UI, you must create this file manually via SSH.
+
 
 ### Step-by-Step SSH Instructions:
 1. Connect to your server:
@@ -88,6 +64,37 @@ http:
 ```
 
 5. Save and exit (`Ctrl+O`, `Enter`, `Ctrl+X`).
+
+---
+
+## 2. Global Traefik Configuration (`traefik.yml`)
+
+Log in to your **Dokploy Dashboard**, navigate to **Settings > Traefik**, and find the **Static Configuration** (`traefik.yml`). Update the `entryPoints` section as follows:
+
+```yaml
+entryPoints:
+  web:
+    address: :80
+  websecure:
+    forwardedHeaders:
+      # Trust all IPs for headers because we will filter at the middleware layer
+      trustedIPs:
+        - "0.0.0.0/0"
+        - "::/0"
+    address: :443
+    http3:
+      advertisedPort: 443
+    http:
+      middlewares:
+        # Apply the Cloudflare filter globally to all HTTPS traffic
+        - only-cloudflare@file
+      tls:
+        certResolver: letsencrypt
+```
+
+### Why these settings?
+*   **trustedIPs**: We set this to broad ranges because we are offloading the IP filtering to a specialized middleware.
+*   **middlewares**: By adding `only-cloudflare@file` to the `websecure` entrypoint, **every** application on your server will automatically benefit from the Cloudflare-only protection.
 
 ---
 
