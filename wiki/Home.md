@@ -18,6 +18,7 @@ The system consists of three primary services orchestrated via Docker Compose:
 - [**Customizing PHP**](PHP-Configuration.md): How to adjust memory limits, upload sizes, and more.
 - [**Security Hardening**](Security-Hardening.md): Best practices for protecting your site.
 - [**Advanced Cloudflare Setup**](Advanced-Cloudflare-Integration.md): Lockdown your server to ONLY allow Cloudflare traffic.
+- [**Fail2Ban (IP Blocking)**](Fail2Ban-Setup.md): Prevent brute-force by blocking IPs at the Cloudflare edge.
 - [**Cron & Scheduled Tasks**](Cron-Management.md): How WordPress cron is handled by the Dokploy Scheduler.
 
 ## 🛠️ Key Features
