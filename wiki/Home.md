@@ -21,6 +21,7 @@ The system consists of three primary services orchestrated via Docker Compose:
 - [**Fail2Ban (IP Blocking)**](Fail2Ban-Setup.md): Prevent brute-force by blocking IPs at the Cloudflare edge.
 - [**Cron & Scheduled Tasks**](Cron-Management.md): How WordPress cron is handled by the Dokploy Scheduler.
 - [**Performance Testing**](Performance-Testing.md): How to audit your site speed using sitespeed.io.
+- [**File Manager Access**](File-Manager-Access.md): Reference guide for setting up a web-based file manager.
 
 ## 🛠️ Key Features
 
