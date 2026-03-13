@@ -87,10 +87,17 @@ if (isset(\$_SERVER['HTTP_CF_CONNECTING_IP'])) {\\
     # 2. Synchronize Database credentials (Auto-update wp-config.php)
     if [ -f "$WP_CONFIG" ]; then
         echo "Synchronizing database credentials in wp-config.php..."
-        [ -n "$WORDPRESS_DB_HOST" ] && sed -i "s/define( 'DB_HOST', .*/define( 'DB_HOST', '$WORDPRESS_DB_HOST' );/" "$WP_CONFIG"
-        [ -n "$WORDPRESS_DB_NAME" ] && sed -i "s/define( 'DB_NAME', .*/define( 'DB_NAME', '$WORDPRESS_DB_NAME' );/" "$WP_CONFIG"
-        [ -n "$WORDPRESS_DB_USER" ] && sed -i "s/define( 'DB_USER', .*/define( 'DB_USER', '$WORDPRESS_DB_USER' );/" "$WP_CONFIG"
-        [ -n "$WORDPRESS_DB_PASSWORD" ] && sed -i "s/define( 'DB_PASSWORD', .*/define( 'DB_PASSWORD', '$WORDPRESS_DB_PASSWORD' );/" "$WP_CONFIG"
+        
+        # Set defaults as per docker-compose.yml
+        SYNC_DB_HOST="${WORDPRESS_DB_HOST:-mariadb:3306}"
+        SYNC_DB_NAME="${WORDPRESS_DB_NAME:-wordpress}"
+        SYNC_DB_USER="${WORDPRESS_DB_USER:-wordpress}"
+        SYNC_DB_PASSWORD="${WORDPRESS_DB_PASSWORD:-wordpress_password}"
+
+        sed -i "s/define( 'DB_HOST', .*/define( 'DB_HOST', '$SYNC_DB_HOST' );/" "$WP_CONFIG"
+        sed -i "s/define( 'DB_NAME', .*/define( 'DB_NAME', '$SYNC_DB_NAME' );/" "$WP_CONFIG"
+        sed -i "s/define( 'DB_USER', .*/define( 'DB_USER', '$SYNC_DB_USER' );/" "$WP_CONFIG"
+        sed -i "s/define( 'DB_PASSWORD', .*/define( 'DB_PASSWORD', '$SYNC_DB_PASSWORD' );/" "$WP_CONFIG"
     fi
 
     # Set ownership for created/modified WordPress files
