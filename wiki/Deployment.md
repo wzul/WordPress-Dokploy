@@ -39,24 +39,34 @@ To test the stack on your local machine before deploying:
 | Variable | Description | Default |
 | :--- | :--- | :--- |
 | `OLS_PASSWORD` | Admin password for OpenLiteSpeed | `admin123` |
-| `SMTP_SERVER` | SMTP Relay Host (e.g. Amazon SES) | (Required) |
-| `SMTP_USERNAME` | SMTP Auth Username | (Required) |
-| `SMTP_PASSWORD` | SMTP Auth Password | (Required) |
-| `OVERWRITE_FROM`| Soft Email Overwrite (Required) | `(None)` |
-| `SERVER_HOSTNAME` | Your site domain (for Postfix EHLO) | `localhost` |
+| `INSTALL_WORDPRESS` | Set to `false` to skip auto-downloading WP | `true` |
+| `COMPOSE_PROFILES` | Enable optional tools like `tools` (phpMyAdmin) | `(None)` |
+| `SMTP_SERVER` | SMTP Relay Host (e.g. Amazon SES) | `(None)` |
+| `SMTP_USERNAME` | SMTP Auth Username | `(None)` |
+| `SMTP_PASSWORD` | SMTP Auth Password | `(None)` |
+| `OVERWRITE_FROM`| Soft Email Overwrite Address | `(None)` |
+| `SERVER_HOSTNAME` | Your site domain (for Postfix EHLO) | `example.com` |
 | `SES_TENANT_TAG` | AWS SES Tenant ID for tagging | `default` |
-| `WORDPRESS_DB_HOST` | Database host (e.g. mysql:3306) | `wp_db` |
+| `VALKEY_HOST` | Object Cache Host | `valkey` |
+| `VALKEY_PORT` | Object Cache Port | `6379` |
+| `LITESPEED_CACHE_OBJECT_CONF`| Forced LSCache Object Config | `true` |
+| `LITESPEED_CACHE_OBJECT_ENABLE`| Forced Object Cache Enable | `true` |
+| `WORDPRESS_DB_HOST` | Database host | `mariadb:3306` |
 | `WORDPRESS_DB_NAME` | Database name | `wordpress` |
 | `WORDPRESS_DB_USER` | Database username | `wordpress` |
-| `WORDPRESS_DB_PASSWORD` | Database password | (Required) |
+| `WORDPRESS_DB_PASSWORD` | Database password | `(Required)` |
+| `MYSQL_ROOT_PASSWORD`| MariaDB Root Password | `(Required)` |
+| `MARIADB_AUTO_UPGRADE`| Auto-migrate DB system tables | `1` |
+| `PHP_MAX_CONNS` | Max concurrent PHP processes | `35` |
 | `WORDPRESS_MEMORY_LIMIT`| PHP Memory Limit | `256M` |
 | `WORDPRESS_UPLOAD_LIMIT`| Max upload size | `64M` |
 | `WORDPRESS_MAX_EXECUTION_TIME`| PHP script timeout | `300` |
 | `WORDPRESS_MAX_INPUT_VARS`| Max post variables | `3000` |
 | `OPCACHE_ENABLE`| Enable Opcache | `1` |
-| `OPCACHE_MEMORY_CONSUMPTION`| Opcache RAM usage | `256` |
+| `OPCACHE_MEMORY_CONSUMPTION`| Opcache RAM usage (MB) | `256` |
 | `OPCACHE_MAX_ACCELERATED_FILES`| Max cached files | `15000` |
 | `OPCACHE_REVALIDATE_FREQ`| Cache TTL in seconds | `300` |
+| `OPCACHE_FAST_SHUTDOWN`| Enable fast shutdown | `1` |
 
 ## 📁 Managing Volumes
 The system uses named volumes to ensure your data persists across redeployments:

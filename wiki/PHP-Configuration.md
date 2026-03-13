@@ -23,16 +23,14 @@ The stack comes pre-configured with highly tuned settings for WordPress producti
 > [!TIP]
 > **Production vs Development**: These values are optimized for production where code rarely changes (`revalidate_freq=300` means PHP only checks for modified files every 5 minutes). For active development, you may want to set `OPCACHE_REVALIDATE_FREQ` to `2`.
 
-### 3. Native LSAPI Process Management
-Since this stack uses **OpenLiteSpeed + LSAPI**, you no longer need to manage complex PHP-FPM pools. 
+### 3. PHP Scaling (Concurrency)
+This stack uses **OpenLiteSpeed + LSAPI**, providing high-performance process management. You can control the concurrency ceiling directly:
+- `PHP_MAX_CONNS` (Default: `35`) - Controls the maximum number of simultaneous PHP processes.
+- **Why not higher?** Each process uses 20-50MB of RAM. 35 is safe for a 1GB RAM VPS. Scale this up if you have more RAM (e.g., 100 for a 4GB VPS).
 
-LiteSpeed handles process spawning and scaling natively:
-- **High Efficiency**: Processes communicate via lightning-fast local SAPIs rather than network-based FastCGI.
-- **Auto-Scaling**: LiteSpeed automatically adjusts the number of PHP workers based on incoming traffic.
-- **Resource Management**: In-built protection ensures that a spike in traffic won't crash your server by overloading individual PHP pools.
-
-### 4. Direct Configuration
-If you need to adjust specific LiteSpeed PHP external processor settings (like `maxConns`), these can be modified in the **WebAdmin Console** (Port 7080) or via the global `httpd_config.conf` within the container.
+### 4. Background Features
+- `DISABLE_WP_CRON` (Default: `true`) - Automatically disables internal WP cron in `wp-config.php` so it can be handled by the Dokploy Scheduler.
+- `INSTALL_WORDPRESS` (Default: `true`) - Set to `false` if you are migrating an existing site and don't want the container to download a fresh copy of WP on startup.
 
 ## 🛠️ Modifying Settings via Dokploy
 You don't need to push a new commit or SSH into the server to change these settings:
