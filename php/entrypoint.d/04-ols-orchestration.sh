@@ -5,6 +5,12 @@
 mkdir -p /usr/local/lsws/conf/templates/
 mkdir -p /usr/local/lsws/conf/vhosts/localhost/
 
+# Force 1 worker process for ultra-low RAM usage
+if ! grep -q "workerProcesses" /usr/local/lsws/conf/httpd_config.conf; then
+    echo "Tuning OLS for low-RAM: Setting 1 worker process..."
+    sed -i "/serverName/a workerProcesses                   1" /usr/local/lsws/conf/httpd_config.conf
+fi
+
 echo "Generating OpenLiteSpeed VHost configuration..."
 cat <<'EOF' > /usr/local/lsws/conf/vhosts/localhost/vhconf.conf
 docRoot                   /var/www/html
