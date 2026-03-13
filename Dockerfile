@@ -34,6 +34,7 @@ ENV OLS_PASSWORD=admin123
 
 # Custom entrypoint for dynamic configuration injection
 COPY php/docker-entrypoint-extra.sh php/lscache-mu.php /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint-extra.sh
+COPY php/entrypoint.d/ /usr/local/bin/entrypoint.d/
+RUN chmod +x /usr/local/bin/docker-entrypoint-extra.sh /usr/local/bin/entrypoint.d/*.sh
 
 ENTRYPOINT ["docker-entrypoint-extra.sh"]
