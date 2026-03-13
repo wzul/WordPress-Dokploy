@@ -11,7 +11,7 @@ When adding a **Domain** or **Port** mapping in the Dokploy UI, use these **Inte
 | **WordPress** | (Always On) | `80` | `localhost:8080` |
 | **OLS Admin** | (Always On) | `7080` | `localhost:7080` |
 | **phpMyAdmin** | `tools` | `80` | `localhost:8081` |
-| **Filebrowser** | `tools` | `80` | `localhost:8082` |
+| **FileBrowser Quantum** | `tools` | `80` | `localhost:8082` |
 | **Dozzle** | `debug` | `8080` | `localhost:8083` |
 | **Mailpit** | `mailpit` | `8025` | `localhost:8025` |
 
