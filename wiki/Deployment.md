@@ -49,6 +49,7 @@ To test the stack on your local machine before deploying:
 | `SES_TENANT_TAG` | AWS SES Tenant ID for tagging | `default` |
 | `VALKEY_HOST` | Object Cache Host | `valkey` |
 | `VALKEY_PORT` | Object Cache Port | `6379` |
+| `VALKEY_MAX_MEMORY` | Valkey Max Memory Limit | `64mb` |
 | `LITESPEED_CACHE_OBJECT_CONF`| Forced LSCache Object Config | `true` |
 | `LITESPEED_CACHE_OBJECT_ENABLE`| Forced Object Cache Enable | `true` |
 | `WORDPRESS_DB_HOST` | Database host | `mariadb:3306` |
