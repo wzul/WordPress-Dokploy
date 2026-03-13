@@ -45,10 +45,33 @@ This project includes optional services that are disabled by default to save ser
 > - Use a long, complex password.
 > - **IP Restricted**: Best used behind a VPN or IP-restricted access.
 
+## 🔍 Dozzle (Log Viewer)
+
+**Dozzle** provides a real-time web interface for viewing container logs. It is configured under the `debug` profile.
+
+### How to Enable in Dokploy
+
+1.  Set `COMPOSE_PROFILES=debug` (or `tools,debug`).
+2.  **Accessing Dozzle**:
+    - Add a **Domain** or **Port** to the `dozzle` service in Dokploy.
+    - If testing locally, it is available at `http://localhost:8083`.
+
+## 📧 Mailpit (Email Catcher)
+
+**Mailpit** catches outgoing emails for testing purposes. It is configured under the `debug` profile.
+
+### How to Enable in Dokploy
+
+1.  Set `COMPOSE_PROFILES=debug`.
+2.  **Accessing Mailpit**:
+    - Add a **Domain** or **Port** to the `mailpit` service in Dokploy.
+    - If testing locally, it is available at `http://localhost:8025`.
+
 ## 🚀 Active Profiles
 
-You can enable multiple tools by separating them with a comma:
+You can enable multiple categories by separating them with a comma:
 
 ```env
-COMPOSE_PROFILES=tools,monitoring
+# Enable everything
+COMPOSE_PROFILES=tools,debug
 ```
