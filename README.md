@@ -31,39 +31,14 @@ This is the most professional way to deploy, as it allows for easy updates and v
 ---
 
 ### 2. Manual "Raw YAML" Deployment
-If you just want to copy-paste the configuration without linking a repository:
+If you prefer to copy-paste the configuration manually into Dokploy:
 
-1.  **In Dokploy**: Select **Add Service > Compose**.
-2.  **Setup**: Select the **"Raw"** input type.
-3.  **Paste**: Copy and paste the following block into the editor:
-4.  **Environment**: Don't forget to add your variables from the [**.env.example**](.env.example) file in the **Environment** tab.
-
-```yaml
-services:
-  wordpress:
-    image: ghcr.io/wzul/wordpress-dokploy:latest
-    volumes:
-      - wp_app:/var/www/html
-    init: true
-    env_file: ".env"
-    restart: unless-stopped
-
-  mail-relay:
-    image: ghcr.io/wzul/wordpress-dokploy-mail-relay:latest
-    env_file: ".env"
-    restart: unless-stopped
-
-  valkey:
-    image: valkey/valkey:latest
-    command: valkey-server --protected-mode no
-    restart: unless-stopped
-
-volumes:
-  wp_app:
-```
-
-4. **Environment Variables**: Go to the service's **Environment** tab. Add your settings (e.g., `WORDPRESS_DB_PASSWORD`, `SMTP_PASSWORD`). Review the `.env.example` file in this repository for a list of all tunable settings!
-5. **Deploy**: Click **Deploy**! Dokploy will instantly pull the pre-compiled images and launch your site.
+1.  Open the [**docker-compose.yml**](docker-compose.yml) file in this repository.
+2.  **Copy** the entire contents of that file.
+3.  **In Dokploy**: Select **Add Service > Compose**.
+4.  **Setup**: Select the **"Raw"** input type and paste the contents.
+5.  **Environment**: Add your variables from the [**.env.example**](.env.example) file in the **Environment** tab.
+6.  **Deploy**: Click **Deploy**!
 ---
 
 ## SMTP & Native mail() Support
