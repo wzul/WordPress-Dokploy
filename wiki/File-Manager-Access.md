@@ -1,64 +1,39 @@
-# File Manager Access (Reference)
+# File Manager Access
 
-For advanced file management beyond standard SFTP/SSH, you can deploy a **Filebrowser** container to interact with your WordPress persistent volumes directly through a web interface.
+This project includes **Filebrowser** as an optional service to interact with your WordPress persistent volumes directly through a web interface.
 
-> [!IMPORTANT]
-> This documentation is for **reference purposes only**. Implementing a web-based file manager introduces security considerations. Ensure you use strong credentials and, ideally, place it behind a VPN or IP-restricted firewall.
+## 🛠️ How to Enable in Dokploy
 
-## 🏗️ Configuration Template
+Filebrowser is categorized under the `tools` profile, the same as phpMyAdmin.
 
-The following `docker-compose.yml` snippet can be used as a starting point to deploy Filebrowser alongside your Dokploy services.
-
-```yaml
-services:
-  filebrowser:
-    image: hurlenko/filebrowser:latest
-    container_name: filebrowser
-    environment:
-      - FB_BASEURL=/filebrowser
-      - PUID=33  # Run as www-data to match WordPress permissions
-      - PGID=33
-    ports:
-      - "8080:80"
-    volumes:
-      # 1. Internal Filebrowser data (users, settings, etc.)
-      - filebrowser-data:/data/main 
-      
-      # 2. Filebrowser Configuration
-      - filebrowser-config:/config 
-      
-      # 3. WordPress Application Volume (Mounted as a sub-folder)
-      # Replace <wordpress_volume_name> with your actual Docker volume name
-      - <wordpress_volume_name>:/data/wordpress
-    restart: unless-stopped
-
-volumes:
-  filebrowser-data:
-  filebrowser-config:
-  # Reference existing WordPress volumes
-  <wordpress_volume_name>:
-    external: true
-```
+1.  Log in to your **Dokploy** panel.
+2.  Navigate to your **Project -> Environment Variables**.
+3.  Add or update the following variable:
+    ```env
+    COMPOSE_PROFILES=tools
+    ```
+4.  **Save** and **Deploy** the project.
+5.  **Accessing Filebrowser**: 
+    - You must add a **Domain** or **Port** to the `filebrowser` service in the Dokploy UI.
+    - If testing locally, it is available at `http://localhost:8082`.
 
 ## ⚙️ Key Configuration Details
 
-### 1. Permissions (`PUID`/`PGID`)
-The `PUID=33` and `PGID=33` environment variables ensure that Filebrowser operates as the `www-data` user. This is critical for maintaining compatibility with WordPress file permissions, allowing you to upload and modify files without causing "Permission Denied" errors in the WordPress dashboard.
+### 1. Permissions
+The service is configured to run as `user: "65534:65534"` (nobody:nogroup). This matches the permissions used by OpenLiteSpeed, ensuring you can edit WordPress files without permission conflicts.
 
-### 2. Base URL & Port
-- **`FB_BASEURL=/filebrowser`**: This hosts Filebrowser on the `/filebrowser` sub-path.
-- **Port 8080**: The container is mapped to port `8080`. You should point your domain or reverse proxy to this port.
-
-### 3. External Volumes
-By setting `external: true` for your WordPress volume, you tell Docker to use the existing volume created by your WordPress service rather than creating a new one.
-
-To find your actual volume name, you can run:
-```bash
-docker volume ls | grep wp_app
-```
+### 2. Root Directory
+The WordPress application volume is mounted at the root `/srv` directory within Filebrowser.
 
 ## 🔐 Security Recommendations
 
-- **Authentication**: Filebrowser has built-in authentication. Change the default password immediately after the first login.
-- **Reverse Proxy**: Use a reverse proxy (like Nginx or Traefik) to enable HTTPS.
-- **IP Restriction**: If possible, restrict access to the Filebrowser port/URL to known IP addresses only.
+> [!WARNING]
+> Web-based file managers are high-security risks if not protected.
+
+- **Immediate Password Change**: The default login for Filebrowser is `admin` / `admin`. Change this immediately upon first login.
+- **HTTPS**: Always use a domain with SSL (HTTPS) when accessing Filebrowser.
+- **Disable when not in use**: Set `COMPOSE_PROFILES=` (empty) and redeploy to stop the service when your maintenance task is finished.
+- **IP Restriction**: Use Dokploy's advanced settings or a firewall to restrict access to your specific IP address.
+
+---
+*For more details on optional services, see [Optional Services](Optional-Services.md).*

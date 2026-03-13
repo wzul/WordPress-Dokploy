@@ -26,9 +26,29 @@ This project includes optional services that are disabled by default to save ser
 > - **Use Strong Passwords**: Ensure your `MYSQL_ROOT_PASSWORD` is complex.
 > - **IP Whitelisting**: If possible, restrict access to `phpmyadmin` via your firewall or proxy.
 
-## 🚀 Future Options
-If this project adds more tools (e.g., File Managers or Redis GUIs), they will also be assigned to profiles. You can enable multiple tools by separating them with a comma:
+## 📂 Filebrowser
+
+**Filebrowser** is a web-based file management tool. It is also configured under the `tools` profile.
+
+### How to Enable in Dokploy
+
+1.  Follow the same steps as above for `COMPOSE_PROFILES=tools`.
+2.  **Accessing Filebrowser**:
+    - Add a **Domain** or **Port** to the `filebrowser` service in Dokploy.
+    - If testing locally, it is available at `http://localhost:8082`.
+    - **Default Login**: `admin` / `admin` (Change immediately!)
+
+### Security Note
+> [!WARNING]
+> Web-based file managers provide full access to your application code.
+> - **Disable immediately** after use.
+> - Use a long, complex password.
+> - **IP Restricted**: Best used behind a VPN or IP-restricted access.
+
+## 🚀 Active Profiles
+
+You can enable multiple tools by separating them with a comma:
 
 ```env
-COMPOSE_PROFILES=tools,debug,monitoring
+COMPOSE_PROFILES=tools,monitoring
 ```

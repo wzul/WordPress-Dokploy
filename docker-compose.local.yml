@@ -46,6 +46,21 @@ services:
       - mariadb
     restart: unless-stopped
 
+  filebrowser:
+    image: filebrowser/filebrowser:latest
+    profiles:
+      - tools
+    ports:
+      - "8082:80"
+    user: "65534:65534" # nobody:nogroup (matches LiteSpeed)
+    volumes:
+      - wp_app:/srv
+      - filebrowser_data:/database
+      - filebrowser_settings:/config
+    restart: unless-stopped
+
 volumes:
   wp_app:
   db_data:
+  filebrowser_data:
+  filebrowser_settings:
