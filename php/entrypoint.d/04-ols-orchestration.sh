@@ -33,7 +33,7 @@ perClientConnLimit  {
 
 scripthttpConfig  {
   libPath                 modules/lsapi.so
-  maxConn                 100
+  maxConn                 ${PHP_MAX_CONNS:-35}
   env                     LSAPI_MAX_REQS=500
   env                     LSAPI_MAX_IDLE=60
 }
