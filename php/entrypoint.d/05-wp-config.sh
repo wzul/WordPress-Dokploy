@@ -36,8 +36,23 @@ if (isset(\$_SERVER['HTTP_CF_CONNECTING_IP'])) {\\
         if [ "$DISABLE_WP_CRON" = "true" ]; then
             if ! grep -q "DISABLE_WP_CRON" "$WP_CONFIG"; then
                 echo "Disabling internal WordPress cron in wp-config.php..."
-                # Insert before the "stop editing" line
                 sed -i "/\* That's all, stop editing!/i define('DISABLE_WP_CRON', true);" "$WP_CONFIG"
+            fi
+        fi
+
+        # 1.3 Handle WordPress Debugging
+        if [ "$WORDPRESS_DEBUG" = "true" ]; then
+            if ! grep -q "WP_DEBUG" "$WP_CONFIG"; then
+                echo "Enabling WordPress Debugging mode..."
+                sed -i "/\* That's all, stop editing!/i \
+define('WP_DEBUG', true); \\
+define('WP_DEBUG_LOG', true); \\
+define('WP_DEBUG_DISPLAY', false);" "$WP_CONFIG"
+                
+                # Symlink debug.log to stderr so it shows in Docker/Dozzle logs
+                mkdir -p /var/www/html/wp-content
+                touch /var/www/html/wp-content/debug.log
+                ln -sf /proc/self/fd/2 /var/www/html/wp-content/debug.log
             fi
         fi
     fi
