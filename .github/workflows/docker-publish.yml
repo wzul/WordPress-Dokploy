@@ -31,6 +31,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Extract metadata for WordPress
         id: meta-wp
         uses: docker/metadata-action@v6
@@ -49,6 +52,8 @@ jobs:
           push: true
           tags: ${{ steps.meta-wp.outputs.tags }}
           labels: ${{ steps.meta-wp.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   build-and-push-mail-relay:
     runs-on: ubuntu-latest
@@ -66,6 +71,9 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Extract metadata for Mail Relay
         id: meta-mail
@@ -85,6 +93,8 @@ jobs:
           push: true
           tags: ${{ steps.meta-mail.outputs.tags }}
           labels: ${{ steps.meta-mail.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   build-and-push-mariadb:
     runs-on: ubuntu-latest
@@ -102,6 +112,9 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Extract metadata for MariaDB
         id: meta-mariadb
@@ -121,6 +134,8 @@ jobs:
           push: true
           tags: ${{ steps.meta-mariadb.outputs.tags }}
           labels: ${{ steps.meta-mariadb.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   generate-dokploy-payload:
     needs: [build-and-push-wordpress, build-and-push-mail-relay, build-and-push-mariadb]
