@@ -5,14 +5,22 @@
 mkdir -p /usr/local/lsws/conf/templates/
 mkdir -p /usr/local/lsws/conf/vhosts/localhost/
 
-# Force 1 worker process for ultra-low RAM usage
-if ! grep -q "workerProcesses" /usr/local/lsws/conf/httpd_config.conf; then
-    echo "Tuning OLS for low-RAM: Setting 1 worker process..."
-    sed -i "/serverName/a workerProcesses                   1" /usr/local/lsws/conf/httpd_config.conf
-fi
+# 1. Global Performance Tuning (Clean up and Force 1 Worker)
+echo "Applying Global Performance Tuning..."
+# Remove any existing workerProcesses lines to avoid duplicates
+sed -i '/workerProcesses/d' /usr/local/lsws/conf/httpd_config.conf
+# Insert workerProcesses 1 at the top of the file
+sed -i '1iworkerProcesses 1' /usr/local/lsws/conf/httpd_config.conf
 
-# 2. Generate Virtual Host Configuration (vhconf.conf)
-# This handles the specific settings for the localhost/default site
+# 2. Sync Global PHP Engine Limits
+echo "Syncing global PHP limits to ${PHP_MAX_CONNS:-15}..."
+# This matches the label followed by any amount of space and replaces the number
+sed -i "s/\(maxConns\)[[:space:]]\+[0-9]\+/\1                        ${PHP_MAX_CONNS:-15}/g" /usr/local/lsws/conf/httpd_config.conf
+sed -i "s/PHP_LSAPI_CHILDREN=[0-9]\+/PHP_LSAPI_CHILDREN=${PHP_MAX_CONNS:-15}/g" /usr/local/lsws/conf/httpd_config.conf
+
+echo "Tuning applied successfully."
+
+# 3. Generate Virtual Host Configuration (vhconf.conf)
 echo "Generating OpenLiteSpeed VHost configuration..."
 cat <<EOF > /usr/local/lsws/conf/vhosts/localhost/vhconf.conf
 docRoot                   /var/www/html
@@ -38,12 +46,14 @@ perClientConnLimit  {
   banPeriod               300
 }
 
-# PHP Engine Configuration
+# PHP Engine Configuration (Low-RAM Tuning)
 scripthttpConfig  {
   libPath                 modules/lsapi.so
-  maxConn                 ${PHP_MAX_CONNS:-12}
+  maxConn                 ${PHP_MAX_CONNS:-15}
   env                     LSAPI_MAX_REQS=500
   env                     LSAPI_MAX_IDLE=60
+  env                     PHP_LSAPI_CHILDREN=${PHP_MAX_CONNS:-15}
+  env                     LSAPI_AVOID_FORK=256M
 }
 
 # Compression Settings
