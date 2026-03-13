@@ -21,7 +21,7 @@ The recommended way to back up this stack is using Dokploy's built-in backup eng
 1. Log in to your **Dokploy** panel.
 2. Navigate to **Backup Destinations** (or equivalent settings).
 3. Add a new **S3 Compatible** destination with your RustFS details:
-    - **Endpoint**: Your RustFS URL (e.g., `https://s3.yourdomain.com`)
+    - **Endpoint**: Your RustFS URL (e.g., `http://rustfs-container-name:9000`)
     - **Access Key**: Your RustFS Access Key
     - **Secret Key**: Your RustFS Secret Key
     - **Bucket**: Your desired backup bucket name
