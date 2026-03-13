@@ -11,6 +11,7 @@ tail -F /usr/local/lsws/logs/error.log >&2 &
 tail -F /usr/local/lsws/logs/stderr.log >&2 &
 tail -F /usr/local/lsws/logs/access.log >&1 &
 tail -F /usr/local/lsws/logs/localhost.access.log >&1 &
+/usr/local/bin/htaccess-watcher.sh &
 
 # Load all entrypoint scripts from the entrypoint.d directory
 # They are executed in alphabetical order

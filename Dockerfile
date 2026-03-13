@@ -2,7 +2,7 @@ FROM litespeedtech/openlitespeed:1.8.5-lsphp84
 
 # Install dependencies and msmtp
 RUN apt-get update && \
-    apt-get install -y msmtp msmtp-mta curl unzip wget less && \
+    apt-get install -y msmtp msmtp-mta curl unzip wget less inotify-tools && \
     rm -rf /var/lib/apt/lists/*
 
 # Install WP-CLI and create a wrapper to run it as the "nobody" user automatically
@@ -33,8 +33,8 @@ ENV DISABLE_WP_CRON=true
 ENV OLS_PASSWORD=admin123
 
 # Custom entrypoint for dynamic configuration injection
-COPY php/docker-entrypoint-extra.sh php/lscache-mu.php /usr/local/bin/
+COPY php/docker-entrypoint-extra.sh php/htaccess-watcher.sh php/lscache-mu.php /usr/local/bin/
 COPY php/entrypoint.d/ /usr/local/bin/entrypoint.d/
-RUN chmod +x /usr/local/bin/docker-entrypoint-extra.sh /usr/local/bin/entrypoint.d/*.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint-extra.sh /usr/local/bin/htaccess-watcher.sh /usr/local/bin/entrypoint.d/*.sh
 
 ENTRYPOINT ["docker-entrypoint-extra.sh"]

@@ -106,13 +106,6 @@ virtualHostConfig  {
       enable              1
       inherit             1
       RewriteFile .htaccess
-      
-      # Standard WordPress Front Controller
-      RewriteBase /
-      RewriteRule ^index\.php$ - [L]
-      RewriteCond %{REQUEST_FILENAME} !-f
-      RewriteCond %{REQUEST_FILENAME} !-d
-      RewriteRule . /index.php [L]
     }
   }
 
