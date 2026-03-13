@@ -62,7 +62,7 @@ scripthttpConfig  {
   env                     LSAPI_MAX_REQS=500
   env                     LSAPI_MAX_IDLE=60
   env                     PHP_LSAPI_CHILDREN=${PHP_MAX_CONNS:-15}
-  env                     LSAPI_AVOID_FORK=256M
+  env                     LSAPI_AVOID_FORK=200M
 }
 
 # Compression Settings
