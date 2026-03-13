@@ -1,6 +1,13 @@
 # WordPress Deployment with Dokploy (OpenLiteSpeed)
 
-This repository contains a WordPress setup optimized for deployment via [Dokploy](https://dokploy.com/). It includes pre-configured PHP settings, **OpenLiteSpeed** as the web server, and a built-in SMTP relay sidecar for high-performance email delivery.
+This repository contains a WordPress setup optimized for deployment via [Dokploy](https://dokploy.com/). 
+
+### 🛠️ Technology Stack
+- **PHP**: 8.4 (LSPHP)
+- **Web Server**: OpenLiteSpeed 1.8.5
+- **Database**: MariaDB (Latest)
+- **Object Cache**: Valkey (Redis-compatible)
+- **SMTP**: Built-in Postfix Relay
 
 > [!TIP]
 > **Check out the [Project Wiki](wiki/Home.md) for detailed documentation on architecture, SMTP, and OpenLiteSpeed management.**

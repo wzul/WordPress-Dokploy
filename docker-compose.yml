@@ -25,7 +25,6 @@ services:
       MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD:-wordpress_password}
       MARIADB_AUTO_UPGRADE: ${MARIADB_AUTO_UPGRADE:-1}
 
-
   valkey:
     image: valkey/valkey:latest
     command: valkey-server --protected-mode no --maxmemory ${VALKEY_MAX_MEMORY:-64mb} --maxmemory-policy allkeys-lru --save ""
