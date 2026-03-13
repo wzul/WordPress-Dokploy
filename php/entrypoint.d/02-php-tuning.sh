@@ -23,7 +23,7 @@ opcache.enable=${OPCACHE_ENABLE:-1}
 opcache.memory_consumption=${OPCACHE_MEMORY_CONSUMPTION:-256}
 opcache.interned_strings_buffer=${OPCACHE_INTERNED_STRINGS_BUFFER:-8}
 opcache.max_accelerated_files=${OPCACHE_MAX_ACCELERATED_FILES:-15000}
-opcache.revalidate_freq=${OPCACHE_REVALIDATE_FREQ:-300}
+opcache.revalidate_freq=${OPCACHE_REVALIDATE_FREQ:-86400}
 opcache.fast_shutdown=${OPCACHE_FAST_SHUTDOWN:-1}
 
 ; --- Stabilization: Commented out to prevent 503 Crashes ---
