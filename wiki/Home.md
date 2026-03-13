@@ -22,6 +22,7 @@ The system consists of three primary services orchestrated via Docker Compose:
 - [**Cron & Scheduled Tasks**](Cron-Management.md): How WordPress cron is handled by the Dokploy Scheduler.
 - [**Performance Testing**](Performance-Testing.md): How to audit your site speed using sitespeed.io.
 - [**File Manager Access**](File-Manager-Access.md): Reference guide for setting up a web-based file manager.
+- [**Backup Strategy**](Backups.md): Recommendations for off-site backups using RustFS.
 
 ## 🛠️ Key Features
 
