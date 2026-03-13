@@ -33,10 +33,19 @@ if (isset(\$_SERVER['HTTP_CF_CONNECTING_IP'])) {\\
 }" "$WP_CONFIG"
         fi
 
+        # 1.2 Handle WordPress Cron
         if [ "$DISABLE_WP_CRON" = "true" ]; then
             if ! grep -q "DISABLE_WP_CRON" "$WP_CONFIG"; then
                 echo "Disabling internal WordPress cron in wp-config.php..."
                 sed -i "/\* That's all, stop editing!/i define('DISABLE_WP_CRON', true);" "$WP_CONFIG"
+            else
+                echo "Ensuring internal WP Cron is disabled..."
+                sed -i "s/define( 'DISABLE_WP_CRON', .*/define( 'DISABLE_WP_CRON', true );/" "$WP_CONFIG"
+            fi
+        else
+            if grep -q "DISABLE_WP_CRON" "$WP_CONFIG"; then
+                echo "Enabling internal WordPress cron..."
+                sed -i "s/define( 'DISABLE_WP_CRON', .*/define( 'DISABLE_WP_CRON', false );/" "$WP_CONFIG"
             fi
         fi
 
@@ -48,11 +57,20 @@ if (isset(\$_SERVER['HTTP_CF_CONNECTING_IP'])) {\\
 define('WP_DEBUG', true); \\
 define('WP_DEBUG_LOG', true); \\
 define('WP_DEBUG_DISPLAY', false);" "$WP_CONFIG"
-                
-                # Symlink debug.log to stderr so it shows in Docker/Dozzle logs
-                mkdir -p /var/www/html/wp-content
-                touch /var/www/html/wp-content/debug.log
-                ln -sf /proc/self/fd/2 /var/www/html/wp-content/debug.log
+            else
+                echo "Ensuring WP_DEBUG is set to true..."
+                sed -i "s/define( 'WP_DEBUG', .*/define( 'WP_DEBUG', true );/" "$WP_CONFIG"
+                sed -i "s/define( 'WP_DEBUG_LOG', .*/define( 'WP_DEBUG_LOG', true );/" "$WP_CONFIG"
+            fi
+            
+            # Ensure debug.log symlink exists for Dozzle
+            mkdir -p /var/www/html/wp-content
+            [ ! -L "/var/www/html/wp-content/debug.log" ] && ln -sf /proc/self/fd/2 /var/www/html/wp-content/debug.log
+        else
+            if grep -q "WP_DEBUG" "$WP_CONFIG"; then
+                echo "Disabling WordPress Debugging mode..."
+                sed -i "s/define( 'WP_DEBUG', .*/define( 'WP_DEBUG', false );/" "$WP_CONFIG"
+                sed -i "s/define( 'WP_DEBUG_LOG', .*/define( 'WP_DEBUG_LOG', false );/" "$WP_CONFIG"
             fi
         fi
     fi
