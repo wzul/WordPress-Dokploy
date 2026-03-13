@@ -5,7 +5,7 @@ This repository contains a WordPress setup optimized for deployment via [Dokploy
 ### 🛠️ Technology Stack
 - **PHP**: 8.4 (LSPHP)
 - **Web Server**: OpenLiteSpeed 1.8.5
-- **Database**: MariaDB (Latest)
+- **Database**: MariaDB 11.8
 - **Object Cache**: Valkey (Redis-compatible)
 - **SMTP**: Built-in Postfix Relay
 
