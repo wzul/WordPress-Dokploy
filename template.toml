@@ -72,6 +72,36 @@ serviceName = "wordpress"
 port = 80
 host = "${main_domain}"
 
+# OpenLiteSpeed WebAdmin
+[[config.domains]]
+serviceName = "wordpress"
+port = 7080
+host = "ols.${main_domain}"
+
+# phpMyAdmin (Database Manager)
+[[config.domains]]
+serviceName = "phpmyadmin"
+port = 80
+host = "pma.${main_domain}"
+
+# File Browser (Storage Manager)
+[[config.domains]]
+serviceName = "filebrowser"
+port = 80
+host = "files.${main_domain}"
+
+# Dozzle (Live Logs)
+[[config.domains]]
+serviceName = "dozzle"
+port = 8080
+host = "logs.${main_domain}"
+
+# Mailpit (Email Catcher)
+[[config.domains]]
+serviceName = "mailpit"
+port = 8025
+host = "mailpit.${main_domain}"
+
 
 # Dokploy Scheduler (WordPress Cron)
 [[config.schedulers]]
