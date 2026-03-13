@@ -30,7 +30,7 @@ ENV OPCACHE_FAST_SHUTDOWN=1
 ENV DISABLE_WP_CRON=true
 
 # Default Admin Setup for OpenLiteSpeed
-ENV OLS_PASSWORD=admin123
+# (Removed OLS_PASSWORD default for security - set via ENV at runtime)
 
 # Custom entrypoint for dynamic configuration injection
 COPY php/docker-entrypoint-extra.sh php/htaccess-watcher.sh php/lscache-mu.php /usr/local/bin/

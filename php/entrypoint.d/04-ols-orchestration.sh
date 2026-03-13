@@ -5,6 +5,15 @@
 mkdir -p /usr/local/lsws/conf/templates/
 mkdir -p /usr/local/lsws/conf/vhosts/localhost/
 
+# Set a safety fallback for the admin password if not provided via ENV
+# This is done at runtime, so it doesn't leak into Docker image layers.
+OLS_PASSWORD=${OLS_PASSWORD:-admin123}
+/usr/local/lsws/admin/misc/admpass.sh "$OLS_PASSWORD" <<EOF
+admin
+$OLS_PASSWORD
+$OLS_PASSWORD
+EOF
+
 # 1. Global Performance Tuning (Clean up and Force 1 Worker)
 echo "Applying Global Performance Tuning..."
 # Remove any existing workerProcesses lines to avoid duplicates
