@@ -61,10 +61,11 @@ if (isset(\$_SERVER['HTTP_CF_CONNECTING_IP'])) {\\
             fi
 
             # 1.3.2 Handle WP_DEBUG_LOG
+            # Set to false to use system error_log (captured by OLS -> Docker)
             if ! grep -q "WP_DEBUG_LOG" "$WP_CONFIG"; then
-                sed -i "/define(\s*['\"]WP_DEBUG['\"]/a define('WP_DEBUG_LOG', true);" "$WP_CONFIG"
+                 sed -i "/define(\s*['\"]WP_DEBUG['\"]/a define('WP_DEBUG_LOG', false);" "$WP_CONFIG"
             else
-                sed -i "s/define(\s*['\"]WP_DEBUG_LOG['\"]\s*,.*/define('WP_DEBUG_LOG', true);/" "$WP_CONFIG"
+                sed -i "s/define(\s*['\"]WP_DEBUG_LOG['\"]\s*,.*/define('WP_DEBUG_LOG', false);/" "$WP_CONFIG"
             fi
 
             # 1.3.3 Handle WP_DEBUG_DISPLAY
@@ -74,9 +75,8 @@ if (isset(\$_SERVER['HTTP_CF_CONNECTING_IP'])) {\\
                 sed -i "s/define(\s*['\"]WP_DEBUG_DISPLAY['\"]\s*,.*/define('WP_DEBUG_DISPLAY', false);/" "$WP_CONFIG"
             fi
             
-            # Ensure debug.log symlink exists for Dozzle
-            mkdir -p /var/www/html/wp-content
-            [ ! -L "/var/www/html/wp-content/debug.log" ] && ln -sf /proc/self/fd/2 /var/www/html/wp-content/debug.log
+            # Remove any existing debug.log symlink to avoid confusion
+            rm -f /var/www/html/wp-content/debug.log
         else
             echo "Ensuring WordPress Debugging is disabled..."
             sed -i "s/define(\s*['\"]WP_DEBUG['\"]\s*,.*/define('WP_DEBUG', false);/" "$WP_CONFIG" 2>/dev/null || true
