@@ -16,11 +16,16 @@ function add_config_value() {
 if [ -n "${SMTP_PASSWORD_FILE}" ]; then [ -e "${SMTP_PASSWORD_FILE}" ] && SMTP_PASSWORD=$(cat "${SMTP_PASSWORD_FILE}") || echo "SMTP_PASSWORD_FILE defined, but file not existing, skipping."; fi
 if [ -n "${SMTP_USERNAME_FILE}" ]; then [ -e "${SMTP_USERNAME_FILE}" ] && SMTP_USERNAME=$(cat "${SMTP_USERNAME_FILE}") || echo "SMTP_USERNAME_FILE defined, but file not existing, skipping."; fi
 
-[ -z "${SMTP_SERVER}" ] && echo "SMTP_SERVER is not set" && exit 1
-[ -z "${SERVER_HOSTNAME}" ] && echo "SERVER_HOSTNAME is not set" && exit 1
-[ ! -z "${SMTP_USERNAME}" -a -z "${SMTP_PASSWORD}" ] && echo "SMTP_USERNAME is set but SMTP_PASSWORD is not set" && exit 1
+SMTP_SERVER="${SMTP_SERVER:-mailpit}"
+SERVER_HOSTNAME="${SERVER_HOSTNAME:-example.com}"
+SMTP_PORT="${SMTP_PORT:-1025}"
 
-SMTP_PORT="${SMTP_PORT:-587}"
+# Only enforce authentication if a username is provided (e.g., for Amazon SES)
+# For local tools like Mailpit, both will be empty, and auth is skipped.
+if [[ -n "${SMTP_USERNAME}" ]] && [[ -z "${SMTP_PASSWORD}" ]]; then
+  echo "ERROR: SMTP_USERNAME is set but SMTP_PASSWORD is missing."
+  exit 1
+fi
 
 # If not defined, get the domain from the server host name
 if [ -z "${DOMAIN}" ]; then
