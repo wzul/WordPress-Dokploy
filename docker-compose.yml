@@ -14,7 +14,7 @@ services:
 
   valkey:
     image: valkey/valkey:latest
-    command: valkey-server --protected-mode no
+    command: valkey-server --protected-mode no --maxmemory 64mb --maxmemory-policy allkeys-lru --save ""
     restart: unless-stopped
 
 volumes:
