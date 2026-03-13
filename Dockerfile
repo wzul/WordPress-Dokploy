@@ -33,7 +33,7 @@ ENV DISABLE_WP_CRON=true
 ENV OLS_PASSWORD=admin123
 
 # Custom entrypoint for dynamic configuration injection
-COPY php/docker-entrypoint-extra.sh /usr/local/bin/
+COPY php/docker-entrypoint-extra.sh php/lscache-mu.php /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint-extra.sh
 
 ENTRYPOINT ["docker-entrypoint-extra.sh"]
