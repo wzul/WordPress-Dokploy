@@ -62,3 +62,10 @@ databaseName = "wordpress"
 databaseUser = "wordpress"
 databasePassword = "${db_password}"
 dockerImage = "mariadb:latest"
+
+# Dokploy Scheduler (WordPress Cron)
+[[config.schedulers]]
+name = "WordPress Cron"
+cron = "*/5 * * * *"
+command = "php /var/www/html/wp-cron.php"
+serviceName = "wordpress"
