@@ -24,6 +24,7 @@ The system consists of three primary services orchestrated via Docker Compose:
 - [**File Manager Access**](File-Manager-Access.md): Reference guide for setting up a web-based file manager.
 - [**Backup Strategy**](Backups.md): Recommendations for off-site backups using RustFS.
 - [**Database Maintenance**](Database-Maintenance.md): How to safely upgrade MariaDB versions.
+- [**Optional Services**](Optional-Services.md): Enable phpMyAdmin and other tools using Profiles.
 
 
 ## 🛠️ Key Features

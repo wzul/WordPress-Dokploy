@@ -28,10 +28,22 @@ services:
       MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD:-wordpress_password}
       MARIADB_AUTO_UPGRADE: ${MARIADB_AUTO_UPGRADE:-1}
 
-
   valkey:
     image: valkey/valkey:latest
     command: valkey-server --protected-mode no --maxmemory 64mb --maxmemory-policy allkeys-lru --save ""
+    restart: unless-stopped
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    profiles:
+      - tools
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mariadb
+      PMA_ARBITRARY: 1
+    depends_on:
+      - mariadb
     restart: unless-stopped
 
 volumes:

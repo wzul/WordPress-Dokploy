@@ -31,6 +31,18 @@ services:
     command: valkey-server --protected-mode no --maxmemory 64mb --maxmemory-policy allkeys-lru --save ""
     restart: unless-stopped
 
+  phpmyadmin:
+    image: phpmyadmin:latest
+    profiles:
+      - tools
+    environment:
+      PMA_HOST: mariadb
+      PMA_ARBITRARY: 1
+      UPLOAD_LIMIT: 64M
+    depends_on:
+      - mariadb
+    restart: unless-stopped
+
 volumes:
   wp_app:
   db_data:
