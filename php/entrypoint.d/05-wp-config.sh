@@ -51,27 +51,36 @@ if (isset(\$_SERVER['HTTP_CF_CONNECTING_IP'])) {\\
 
         # 1.3 Handle WordPress Debugging
         if [ "$WORDPRESS_DEBUG" = "true" ]; then
+            echo "Ensuring WordPress Debugging is enabled..."
+            
+            # 1.3.1 Handle WP_DEBUG
             if ! grep -q "WP_DEBUG" "$WP_CONFIG"; then
-                echo "Enabling WordPress Debugging mode..."
-                sed -i "/\* That's all, stop editing!/i \
-define('WP_DEBUG', true); \\
-define('WP_DEBUG_LOG', true); \\
-define('WP_DEBUG_DISPLAY', false);" "$WP_CONFIG"
+                sed -i "/\* That's all, stop editing!/i define('WP_DEBUG', true);" "$WP_CONFIG"
             else
-                echo "Ensuring WP_DEBUG is set to true..."
-                sed -i "s/define( 'WP_DEBUG', .*/define( 'WP_DEBUG', true );/" "$WP_CONFIG"
-                sed -i "s/define( 'WP_DEBUG_LOG', .*/define( 'WP_DEBUG_LOG', true );/" "$WP_CONFIG"
+                sed -i "s/define(\s*['\"]WP_DEBUG['\"]\s*,.*/define('WP_DEBUG', true);/" "$WP_CONFIG"
+            fi
+
+            # 1.3.2 Handle WP_DEBUG_LOG
+            if ! grep -q "WP_DEBUG_LOG" "$WP_CONFIG"; then
+                sed -i "/define(\s*['\"]WP_DEBUG['\"]/a define('WP_DEBUG_LOG', true);" "$WP_CONFIG"
+            else
+                sed -i "s/define(\s*['\"]WP_DEBUG_LOG['\"]\s*,.*/define('WP_DEBUG_LOG', true);/" "$WP_CONFIG"
+            fi
+
+            # 1.3.3 Handle WP_DEBUG_DISPLAY
+            if ! grep -q "WP_DEBUG_DISPLAY" "$WP_CONFIG"; then
+                sed -i "/define(\s*['\"]WP_DEBUG_LOG['\"]/a define('WP_DEBUG_DISPLAY', false);" "$WP_CONFIG"
+            else
+                sed -i "s/define(\s*['\"]WP_DEBUG_DISPLAY['\"]\s*,.*/define('WP_DEBUG_DISPLAY', false);/" "$WP_CONFIG"
             fi
             
             # Ensure debug.log symlink exists for Dozzle
             mkdir -p /var/www/html/wp-content
             [ ! -L "/var/www/html/wp-content/debug.log" ] && ln -sf /proc/self/fd/2 /var/www/html/wp-content/debug.log
         else
-            if grep -q "WP_DEBUG" "$WP_CONFIG"; then
-                echo "Disabling WordPress Debugging mode..."
-                sed -i "s/define( 'WP_DEBUG', .*/define( 'WP_DEBUG', false );/" "$WP_CONFIG"
-                sed -i "s/define( 'WP_DEBUG_LOG', .*/define( 'WP_DEBUG_LOG', false );/" "$WP_CONFIG"
-            fi
+            echo "Ensuring WordPress Debugging is disabled..."
+            sed -i "s/define(\s*['\"]WP_DEBUG['\"]\s*,.*/define('WP_DEBUG', false);/" "$WP_CONFIG" 2>/dev/null || true
+            sed -i "s/define(\s*['\"]WP_DEBUG_LOG['\"]\s*,.*/define('WP_DEBUG_LOG', false);/" "$WP_CONFIG" 2>/dev/null || true
         fi
     fi
 
