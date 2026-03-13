@@ -11,6 +11,14 @@ This repository contains a WordPress setup optimized for deployment via [Dokploy
 - `docker-compose.local.yml`: The local development playground! Built-in port 8080/7080 mapping and uses `build: .` to test your local code changes immediately.
 - `php/docker-entrypoint-extra.sh`: The brains of the operation! Dynamically configures OpenLiteSpeed, PHP limits, Opcache, and Mail routing entirely from your Environment Variables on startup.
 
+## 🚀 One-Click Deploy to Dokploy (Instant Setup)
+
+To deploy this entire stack instantly, copy the latest Base64 payload from the link below and paste it into Dokploy's **Compose** section:
+
+👉 **[Get Latest Deployment Payload (Base64)](./DOKPLOY_PAYLOAD.txt)**
+
+---
+
 ## 🚀 5-Minute Quick Start
 
 Deploying this stack to **Dokploy** is simple. Follow these 3 steps:

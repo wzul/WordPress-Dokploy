@@ -121,3 +121,42 @@ jobs:
           push: true
           tags: ${{ steps.meta-mariadb.outputs.tags }}
           labels: ${{ steps.meta-mariadb.outputs.labels }}
+
+  generate-dokploy-payload:
+    needs: [build-and-push-wordpress, build-and-push-mail-relay, build-and-push-mariadb]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed to commit the payload file back to the repo
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Generate Payload
+        id: generate
+        run: |
+          PAYLOAD=$(python3 generate_dokploy_base64.py)
+          echo "payload=$PAYLOAD" >> $GITHUB_OUTPUT
+          echo "$PAYLOAD" > DOKPLOY_PAYLOAD.txt
+
+      - name: Update GitHub Job Summary
+        run: |
+          echo "## 🚀 Dokploy Deployment Payload" >> $GITHUB_STEP_SUMMARY
+          echo "Copy the Base64 code below and paste it into Dokploy's **Compose** section." >> $GITHUB_STEP_SUMMARY
+          echo " " >> $GITHUB_STEP_SUMMARY
+          echo '```text' >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.generate.outputs.payload }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Commit and Push Payload File
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add DOKPLOY_PAYLOAD.txt
+          git commit -m "docs: update dokploy deployment payload [skip ci]" || echo "No changes to commit"
+          git push
