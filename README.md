@@ -30,10 +30,10 @@ You **must** set these 4 variables in Dokploy for a successful first launch:
 
 | Key | Example Value | Description |
 | :--- | :--- | :--- |
-| `MYSQL_ROOT_PASSWORD` | `choose_a_strong_pass` | The master password for MariaDB. |
-| `WORDPRESS_DB_PASSWORD` | `choose_another_pass` | The password for the WordPress user. |
-| `OLS_PASSWORD` | `your_admin_pass` | Password for the OpenLiteSpeed Admin Panel. |
-| `SERVER_HOSTNAME` | `yourdomain.com` | Used for email routing and security. |
+| `MYSQL_ROOT_PASSWORD` | `your_strong_password` | The master password for MariaDB. |
+| `WORDPRESS_DB_PASSWORD` | `your_db_password` | The password for the WordPress user. |
+| `OLS_PASSWORD` | `your_admin_password` | Password for the OpenLiteSpeed Admin Panel. |
+| `SERVER_HOSTNAME` | `example.com` | Your site's primary domain. |
 
 ---
 
