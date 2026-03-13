@@ -15,8 +15,11 @@ This setup is designed specifically for **Dokploy** using the "Compose" service 
 1. Create a new **Project**.
 2. Click **Add Service** -> **Compose**.
 3. Point to your Git repository URL.
-4. **General Configuration**:
-   - Set **Compose Path** to `docker-compose.yml`.
+18: 4. **General Configuration**:
+19:    - Set **Compose Path** to `docker-compose.yml`.
+20:    - > [!IMPORTANT]
+21:    - > **Enable "Isolated Deployment"**: It is highly recommended to toggle this **ON**. This ensures your stack runs in its own isolated Docker network, preventing IP conflicts and increasing security between different Dokploy projects.
+22: 
 5. **Environment Configuration**:
    - Go to the **Environment** tab of your service.
    - Add your configuration variables as simple Key/Value pairs (e.g., Key: `OLS_PASSWORD`, Value: `admin123`).
