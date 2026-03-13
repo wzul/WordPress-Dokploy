@@ -18,7 +18,7 @@ auth           off
 tls            off
 logfile        /tmp/msmtp.log
 account        default
-host           mail-relay
-port           25
-from           wordpress@localhost
+host           ${MAIL_RELAY_HOST:-mail-relay}
+port           ${MAIL_RELAY_PORT:-25}
+from           ${OVERWRITE_FROM:-wordpress@localhost}
 EOF
