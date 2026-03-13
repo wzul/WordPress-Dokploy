@@ -1,7 +1,7 @@
 #!/bin/bash
 # 04-ols-orchestration.sh: OpenLiteSpeed VHost and Template configuration
 
-# 1. Dynamic OpenLiteSpeed configuration
+# 1. Dynamic OpenLiteSpeed Global Tuning
 mkdir -p /usr/local/lsws/conf/templates/
 mkdir -p /usr/local/lsws/conf/vhosts/localhost/
 
@@ -11,21 +11,22 @@ if ! grep -q "workerProcesses" /usr/local/lsws/conf/httpd_config.conf; then
     sed -i "/serverName/a workerProcesses                   1" /usr/local/lsws/conf/httpd_config.conf
 fi
 
+# 2. Generate Virtual Host Configuration (vhconf.conf)
+# This handles the specific settings for the localhost/default site
 echo "Generating OpenLiteSpeed VHost configuration..."
-cat <<'EOF' > /usr/local/lsws/conf/vhosts/localhost/vhconf.conf
+cat <<EOF > /usr/local/lsws/conf/vhosts/localhost/vhconf.conf
 docRoot                   /var/www/html
 index  {
   useServer               0
   indexFiles              index.php, index.html, index.htm
 }
 
-# 1. Real IP Detection (Trust Dokploy/Proxy Headers)
+# Real IP Detection
 accessControl  {
   allow                   *
 }
 
-# 2. Per-Client Throttling (High-Performance Fail2Ban)
-# Blocks IPs that spam requests (Brute force protection)
+# Per-Client Throttling (Brute Force Protection)
 perClientConnLimit  {
   staticReqLimit          100
   dynamicReqLimit         5
@@ -37,28 +38,27 @@ perClientConnLimit  {
   banPeriod               300
 }
 
+# PHP Engine Configuration
 scripthttpConfig  {
   libPath                 modules/lsapi.so
-  maxConn                 ${PHP_MAX_CONNS:-35}
+  maxConn                 ${PHP_MAX_CONNS:-12}
   env                     LSAPI_MAX_REQS=500
   env                     LSAPI_MAX_IDLE=60
 }
-EOF
 
-# 2. URL Rewriting (Front Controller pattern for WP/Laravel/etc)
-cat <<EOF >> /usr/local/lsws/conf/vhosts/localhost/vhconf.conf
-rewrite  {
-  enable                  1
-  autoLoadHtaccess        1
-  rules                   <<<END_rules
-# Basic Front Controller Rewrites
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /index.php [L]
-  END_rules
+# Compression Settings
+gzip  {
+  enable                  ${GZIP_ENABLE:-1}
+  compressibleTypes       default
+}
+
+brotli  {
+  enable                  ${BROTLI_ENABLE:-1}
 }
 EOF
 
+# 3. Generate Docker Template (docker.conf)
+# This is the master template used for all Dokploy deployments
 echo "Generating OpenLiteSpeed Template configuration..."
 cat <<'EOF' > /usr/local/lsws/conf/templates/docker.conf
 allowSymbolLink           1
@@ -69,7 +69,7 @@ vhRoot                    /var/www/html/
 configFile                $SERVER_ROOT/conf/vhosts/$VH_NAME/vhconf.conf
 
 virtualHostConfig  {
-  docRoot                 /var/www/html/
+  docRoot                 $VH_ROOT
   enableGzip              1
 
   errorlog  {
@@ -103,7 +103,14 @@ virtualHostConfig  {
     allowBrowse           1
 
     rewrite  {
-RewriteFile .htaccess
+      enable              1
+      inherit             1
+      RewriteFile .htaccess
+      
+      # Standard WordPress Front Controller
+      RewriteCond %{REQUEST_FILENAME} !-f
+      RewriteCond %{REQUEST_FILENAME} !-d
+      RewriteRule . /index.php [L]
     }
   }
 
@@ -123,25 +130,10 @@ RewriteFile .htaccess
     lsapi_cache_enabled   1
   }
 }
-
-# 3. Global Compression Settings (Server Level placeholder if needed)
-# OpenLiteSpeed enables compression by default, but we ensure it here at VHost level.
 EOF
 
-# Update vhconf.conf with compression blocks
-cat <<EOF >> /usr/local/lsws/conf/vhosts/localhost/vhconf.conf
-
-# Compression Settings
-gzip  {
-  enable                  ${GZIP_ENABLE:-1}
-  compressibleTypes       default
-}
-
-brotli  {
-  enable                  ${BROTLI_ENABLE:-1}
-}
-EOF
-
-# Update docker.conf template with compression blocks
+# 4. Final Polish: Apply dynamic compression to the Template
 sed -i "/enableGzip/d" /usr/local/lsws/conf/templates/docker.conf
 sed -i "/docRoot/a \  enableGzip              ${GZIP_ENABLE:-1}\n  enableBrotli            ${BROTLI_ENABLE:-1}" /usr/local/lsws/conf/templates/docker.conf
+
+echo "LiteSpeed orchestration complete."
