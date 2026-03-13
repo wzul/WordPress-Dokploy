@@ -23,6 +23,8 @@ The system consists of three primary services orchestrated via Docker Compose:
 - [**Performance Testing**](Performance-Testing.md): How to audit your site speed using sitespeed.io.
 - [**File Manager Access**](File-Manager-Access.md): Reference guide for setting up a web-based file manager.
 - [**Backup Strategy**](Backups.md): Recommendations for off-site backups using RustFS.
+- [**Database Maintenance**](Database-Maintenance.md): How to safely upgrade MariaDB versions.
+
 
 ## 🛠️ Key Features
 

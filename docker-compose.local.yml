@@ -15,6 +15,20 @@ services:
     env_file: ".env"
     restart: unless-stopped
 
+  mariadb:
+    build: ./mariadb
+    env_file: ".env"
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+      MYSQL_DATABASE: ${WORDPRESS_DB_NAME:-wordpress}
+      MYSQL_USER: ${WORDPRESS_DB_USER:-wordpress}
+      MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD:-wordpress_password}
+      MARIADB_AUTO_UPGRADE: ${MARIADB_AUTO_UPGRADE:-1}
+
+
   valkey:
     image: valkey/valkey:latest
     command: valkey-server --protected-mode no --maxmemory 64mb --maxmemory-policy allkeys-lru --save ""
@@ -22,3 +36,4 @@ services:
 
 volumes:
   wp_app:
+  db_data:
