@@ -47,6 +47,8 @@ services:
     profiles:
       - tools
     user: "0:0"
+    environment:
+      FILEBROWSER_ADMIN_PASSWORD: ${FILEBROWSER_ADMIN_PASSWORD:-admin}
     volumes:
       - wp_app:/srv
       - filebrowser_data:/home/filebrowser/data

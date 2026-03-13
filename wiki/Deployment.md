@@ -42,6 +42,7 @@ To test the stack on your local machine before deploying:
 | Variable | Description | Default |
 | :--- | :--- | :--- |
 | `OLS_PASSWORD` | Admin password for OpenLiteSpeed | `admin123` |
+| `FILEBROWSER_ADMIN_PASSWORD` | Admin password for Filebrowser | `admin` |
 | `INSTALL_WORDPRESS` | Set to `false` to skip auto-downloading WP | `true` |
 | `COMPOSE_PROFILES` | Enable optional tools like `tools` (phpMyAdmin) | `(None)` |
 | `SMTP_SERVER` | SMTP Relay Host (e.g. Amazon SES) | `mailpit` |

@@ -34,7 +34,8 @@ All settings, users, and the database are stored in the `filebrowser_data` volum
 > [!WARNING]
 > Web-based file managers are high-security risks if not protected.
 
-- **Immediate Password Change**: The default login for Filebrowser is `admin` / `admin`. Change this immediately upon first login.
+- **Pre-set Password**: You can set a custom login password before deployment by adding `FILEBROWSER_ADMIN_PASSWORD=your_secure_password` to your environment variables.
+- **Immediate Password Change**: If not using the environment variable, the default login is `admin` / `admin`. Change this immediately upon first login.
 - **HTTPS**: Always use a domain with SSL (HTTPS) when accessing Filebrowser.
 - **Disable when not in use**: Set `COMPOSE_PROFILES=` (empty) and redeploy to stop the service when your maintenance task is finished.
 - **IP Restriction**: Use Dokploy's advanced settings or a firewall to restrict access to your specific IP address.
