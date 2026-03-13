@@ -2,6 +2,21 @@
 
 This project includes optional services that are disabled by default to save server resources (RAM/CPU). You can enable them as needed using **Docker Compose Profiles**.
 
+## 🧭 Port Mapping Cheat Sheet (Dokploy)
+
+When adding a **Domain** or **Port** mapping in the Dokploy UI, use these **Internal Ports**:
+
+| Service | Profile | Internal Port | Local URL |
+| :--- | :--- | :--- | :--- |
+| **WordPress** | (Always On) | `80` | `localhost:8080` |
+| **OLS Admin** | (Always On) | `7080` | `localhost:7080` |
+| **phpMyAdmin** | `tools` | `80` | `localhost:8081` |
+| **Filebrowser** | `tools` | `80` | `localhost:8082` |
+| **Dozzle** | `debug` | `8080` | `localhost:8083` |
+| **Mailpit** | `mailpit` | `8025` | `localhost:8025` |
+
+---
+
 ## 🛠️ phpMyAdmin
 
 **phpMyAdmin** is a web-based database management tool. It is currently configured under the `tools` profile.
@@ -58,11 +73,11 @@ This project includes optional services that are disabled by default to save ser
 
 ## 📧 Mailpit (Email Catcher)
 
-**Mailpit** catches outgoing emails for testing purposes. It is configured under the `debug` profile.
+**Mailpit** catches outgoing emails for testing purposes. It is configured under the `mailpit` profile and is **enabled by default**.
 
-### How to Enable in Dokploy
+### How to Manage in Dokploy
 
-1.  Set `COMPOSE_PROFILES=debug`.
+1.  **Enabled by default**: `COMPOSE_PROFILES=mailpit` is set in the base configuration.
 2.  **Accessing Mailpit**:
     - Add a **Domain** or **Port** to the `mailpit` service in Dokploy.
     - If testing locally, it is available at `http://localhost:8025`.
@@ -72,6 +87,9 @@ This project includes optional services that are disabled by default to save ser
 You can enable multiple categories by separating them with a comma:
 
 ```env
-# Enable everything
-COMPOSE_PROFILES=tools,debug
+# Example: Enable Mailpit + Tools
+COMPOSE_PROFILES=mailpit,tools
+
+# Example: Enable everything
+COMPOSE_PROFILES=mailpit,tools,debug
 ```

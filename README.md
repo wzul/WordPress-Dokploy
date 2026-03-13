@@ -11,10 +11,34 @@ This repository contains a WordPress setup optimized for deployment via [Dokploy
 - `docker-compose.local.yml`: The local development playground! Built-in port 8080/7080 mapping and uses `build: .` to test your local code changes immediately.
 - `php/docker-entrypoint-extra.sh`: The brains of the operation! Dynamically configures OpenLiteSpeed, PHP limits, Opcache, and Mail routing entirely from your Environment Variables on startup.
 
-## 🚀 Deployment Instructions
+## 🚀 5-Minute Quick Start
 
-> [!NOTE]
-> For a more detailed step-by-step guide, see our **[Deployment Guide Wiki](wiki/Deployment.md)**.
+Deploying this stack to **Dokploy** is simple. Follow these 3 steps:
+
+1.  **Create Service**: In Dokploy, add a new **Compose** service and point it to this Git repository.
+2.  **Configure**: In the **General** tab, set the Compose Path to `docker-compose.yml` and enable **Isolated Deployment** (Highly Recommended).
+3.  **Environment**: In the **Environment** tab, add the [Required Variables](#-required-variables) below and click **Deploy**.
+
+> [!TIP]
+> **Performance**: Once live, check the [Cron Management Wiki](wiki/Cron-Management.md) to learn how to offload tasks to the Dokploy Scheduler for better speed.
+
+---
+
+## 🔑 Required Variables
+
+You **must** set these 4 variables in Dokploy for a successful first launch:
+
+| Key | Example Value | Description |
+| :--- | :--- | :--- |
+| `MYSQL_ROOT_PASSWORD` | `choose_a_strong_pass` | The master password for MariaDB. |
+| `WORDPRESS_DB_PASSWORD` | `choose_another_pass` | The password for the WordPress user. |
+| `OLS_PASSWORD` | `your_admin_pass` | Password for the OpenLiteSpeed Admin Panel. |
+| `SERVER_HOSTNAME` | `yourdomain.com` | Used for email routing and security. |
+
+---
+
+## 🏗️ Deployment Detailed Guide
+For a deep dive into advanced settings, check our **[Full Deployment Wiki](wiki/Deployment.md)**.
 
 ### 1. Git Repository Deployment (Recommended)
 This is the most professional way to deploy, as it allows for easy updates and version control directly in Dokploy.

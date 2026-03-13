@@ -44,7 +44,8 @@ To test the stack on your local machine before deploying:
 | `OLS_PASSWORD` | Admin password for OpenLiteSpeed | `admin123` |
 | `INSTALL_WORDPRESS` | Set to `false` to skip auto-downloading WP | `true` |
 | `COMPOSE_PROFILES` | Enable optional tools like `tools` (phpMyAdmin) | `(None)` |
-| `SMTP_SERVER` | SMTP Relay Host (e.g. Amazon SES) | `(None)` |
+| `SMTP_SERVER` | SMTP Relay Host (e.g. Amazon SES) | `mailpit` |
+| `SMTP_PORT` | SMTP Relay Port (usually 587 or 1025) | `1025` |
 | `SMTP_USERNAME` | SMTP Auth Username | `(None)` |
 | `SMTP_PASSWORD` | SMTP Auth Password | `(None)` |
 | `OVERWRITE_FROM`| Soft Email Overwrite Address | `(None)` |
