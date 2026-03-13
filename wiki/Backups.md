@@ -10,26 +10,31 @@ Ensuring your WordPress data is safely backed up is critical. For high-performan
 - **High Performance**: Written in Rust for minimal overhead and maximum throughput.
 - **S3 Compatibility**: Works seamlessly with tools like `rclone`, `rustic`, and standard WordPress backup plugins (e.g., UpdraftPlus).
 - **Native Features**: Supports bucket replication, versioning, and object locking (WORM) for immutable backups.
+- **Dokploy Native Compatibility**: Recommended for use with Dokploy's built-in backup features, enabling seamless management directly through the Dokploy interface.
 
-## 🛠️ Implementation Options
 
-### 1. Manual Backups (rclone)
-You can use `rclone` to sync your WordPress uploads and database dumps to a RustFS bucket.
+## 🛠️ Implementation (Dokploy Native)
 
-```bash
-# Sync WordPress app volume data to RustFS
-rclone sync /path/to/wordpress/data rustfs:my-backup-bucket/wordpress-app
-```
+The recommended way to back up this stack is using Dokploy's built-in backup engine. This allows you to manage everything from a single interface without installing extra WordPress plugins or manual scripts.
 
-### 2. Incremental Backups (rustic)
-For deduplicated and encrypted backups, **rustic** (also written in Rust) is highly recommended. It supports append-only backups to S3-compatible storage like RustFS.
+### 1. Configure RustFS as Storage
+1. Log in to your **Dokploy** panel.
+2. Navigate to **Backup Destinations** (or equivalent settings).
+3. Add a new **S3 Compatible** destination with your RustFS details:
+    - **Endpoint**: Your RustFS URL (e.g., `https://s3.yourdomain.com`)
+    - **Access Key**: Your RustFS Access Key
+    - **Secret Key**: Your RustFS Secret Key
+    - **Bucket**: Your desired backup bucket name
 
-### 3. WordPress Plugins
-Most premium WordPress backup plugins support S3-compatible storage. Simply provide your RustFS:
-- **Endpoint URL**
-- **Access Key**
-- **Secret Key**
-- **Bucket Name**
+### 2. Enable Service Backups
+1. Go to your **WordPress Project** in Dokploy.
+2. For each service (WordPress and Valkey/Database):
+    - Navigate to the **Backups** tab.
+    - Select your **RustFS destination**.
+    - Set your **Cron Schedule** (e.g., `0 0 * * *` for daily at midnight).
+    - Choose the **Retention Policy** (how many backups to keep).
+3. Click **Save/Enable**.
+
 
 ## 🔐 Backup Best Practices
 
