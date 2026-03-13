@@ -2,41 +2,65 @@
 main_domain = "${domain}"
 ols_password = "${password:16}"
 db_password = "${password:32}"
+db_root_password = "${password:32}"
+filebrowser_password = "${password:16}"
 
 [config]
 env = [
-  # Database Configuration (Points to Internal Managed MariaDB)
-  "WORDPRESS_DB_HOST=wp_db",
+  # Docker Compose Profiles (Enabled services)
+  "COMPOSE_PROFILES=mailpit",
+
+  # Database Configuration (Internal MariaDB)
+  "WORDPRESS_DB_HOST=mariadb",
   "WORDPRESS_DB_NAME=wordpress",
   "WORDPRESS_DB_USER=wordpress",
   "WORDPRESS_DB_PASSWORD=${db_password}",
-  
-  # Security
-  "OLS_PASSWORD=${ols_password}",
+  "MYSQL_ROOT_PASSWORD=${db_root_password}",
+  "MYSQL_DATABASE=wordpress",
+  "MYSQL_USER=wordpress",
+  "MYSQL_PASSWORD=${db_password}",
+  "MARIADB_AUTO_UPGRADE=1",
 
-  # PHP Limits
+  # Security & Access
+  "OLS_PASSWORD=${ols_password}",
+  "FILEBROWSER_ADMIN_PASSWORD=${filebrowser_password}",
+  "INSTALL_WORDPRESS=true",
+  "WORDPRESS_DEBUG=false",
+
+  # PHP Limits & Performance
+  "PHP_MAX_CONNS=15",
   "WORDPRESS_MEMORY_LIMIT=256M",
   "WORDPRESS_UPLOAD_LIMIT=64M",
   "WORDPRESS_MAX_EXECUTION_TIME=300",
   "WORDPRESS_MAX_INPUT_VARS=3000",
   
-  # Opcache Defaults (Production Optimized)
+  # Opcache Defaults (1-Day Revalidation)
   "OPCACHE_ENABLE=1",
   "OPCACHE_MEMORY_CONSUMPTION=256",
   "OPCACHE_INTERNED_STRINGS_BUFFER=8",
   "OPCACHE_MAX_ACCELERATED_FILES=15000",
-  "OPCACHE_REVALIDATE_FREQ=300",
+  "OPCACHE_REVALIDATE_FREQ=86400",
   "OPCACHE_FAST_SHUTDOWN=1",
-  
-  # Mail configuration template
-  "SMTP_SERVER=email-smtp.ap-southeast-1.amazonaws.com",
-  "SMTP_PORT=587",
-  "SMTP_USERNAME=AKIAXXXXXXXX",
-  "SMTP_PASSWORD=pass",
+
+  # LiteSpeed Cache - Object Cache (Valkey)
+  "VALKEY_HOST=valkey",
+  "VALKEY_PORT=6379",
+  "VALKEY_MAX_MEMORY=64mb",
+  "LITESPEED_CACHE_OBJECT_CONF=true",
+  "LITESPEED_CACHE_OBJECT_ENABLE=true",
+  "LITESPEED_CACHE_OBJECT_KIND=1",
+
+  # SMTP Relay Configuration
+  "SMTP_SERVER=mailpit",
+  "SMTP_PORT=1025",
+  "SMTP_USERNAME=",
+  "SMTP_PASSWORD=",
   "SERVER_HOSTNAME=${main_domain}",
-  "OVERWRITE_FROM=site-admin@example.com",
+  "MAIL_RELAY_HOST=mail-relay",
+  "MAIL_RELAY_PORT=25",
+  "OVERWRITE_FROM=site-admin@${main_domain}",
   "SES_TENANT_TAG=your-tenant-name",
-  "DISABLE_WP_CRON=true",
+  "DISABLE_WP_CRON=false",
   
   # Performance - Compression
   "GZIP_ENABLE=1",
@@ -48,20 +72,6 @@ serviceName = "wordpress"
 port = 80
 host = "${main_domain}"
 
-# OLS WebAdmin Panel Domain
-[[config.domains]]
-serviceName = "wordpress"
-port = 7080
-host = "ols.${main_domain}"
-
-# Managed MariaDB Setup
-[[config.mariadb]]
-name = "WordPress DB"
-appName = "wp_db"
-databaseName = "wordpress"
-databaseUser = "wordpress"
-databasePassword = "${db_password}"
-dockerImage = "mariadb:latest"
 
 # Dokploy Scheduler (WordPress Cron)
 [[config.schedulers]]
