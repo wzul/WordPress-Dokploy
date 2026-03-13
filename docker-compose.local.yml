@@ -41,7 +41,6 @@ services:
       - "8081:80"
     environment:
       PMA_HOST: mariadb
-      PMA_ARBITRARY: 1
     depends_on:
       - mariadb
     restart: unless-stopped
@@ -52,7 +51,6 @@ services:
       - tools
     ports:
       - "8082:80"
-    user: "65534:65534" # nobody:nogroup (matches LiteSpeed)
     volumes:
       - wp_app:/srv
       - filebrowser_data:/database

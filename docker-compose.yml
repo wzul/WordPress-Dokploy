@@ -37,7 +37,6 @@ services:
       - tools
     environment:
       PMA_HOST: mariadb
-      PMA_ARBITRARY: 1
       UPLOAD_LIMIT: 64M
     depends_on:
       - mariadb
@@ -47,7 +46,6 @@ services:
     image: filebrowser/filebrowser:latest
     profiles:
       - tools
-    user: "65534:65534" # nobody:nogroup (matches LiteSpeed)
     volumes:
       - wp_app:/srv
       - filebrowser_data:/database
